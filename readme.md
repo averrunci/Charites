@@ -67,7 +67,7 @@ The method is declared as follows;
 
 - No argument.
 
-```
+``` csharp
 [EventHandler(ElementName = "ActionButton", Event = "Click")]
 private void OnActionButtonClick()
 {
@@ -77,7 +77,7 @@ private void OnActionButtonClick()
 
 - One argument that is a second argument of EventHandler.
 
-```
+``` csharp
 [EventHandler(ElementName = "ActionButton", Event = "Click")]
 private void OnActionButtonClick(EventArgs e)
 {
@@ -87,7 +87,7 @@ private void OnActionButtonClick(EventArgs e)
 
 - Two arguments that are a first argument and a second argument of EventHandler.
 
-```
+``` csharp
 [EventHandler(ElementName = "ActionButton", Event = "Click")]
 private void OnActionButtonClick(object sender, EventArgs e)
 {
@@ -103,21 +103,21 @@ The implementation is as follows;
 
 - Field
 
-```
+``` csharp
 [DataContext]
 private DataContexType dataContext;
 ```
 
 - Property
 
-```
+``` csharp
 [DataContext]
 public DataContexType DataContext { get; set; }
 ```
 
 - Method
 
-```
+``` csharp
 [DataContext]
 public void SetContext(DataContexType dataContext)
 {
@@ -138,21 +138,21 @@ The implementation to inject an element whose name is "Element" is as follows;
 
 - Field
 
-```
+``` csharp
 [Element(Name = "Element")]
 private ElementType element;
 ```
 
 - Property
 
-```
+``` csharp
 [Element]
 public ElementType Element { get; set; }
 ```
 
 - Method
 
-```
+``` csharp
 [Element]
 public void SetElement(ElementType element)
 {
