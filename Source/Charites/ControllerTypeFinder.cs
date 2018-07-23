@@ -15,9 +15,6 @@ namespace Charites.Windows.Mvc
     /// <typeparam name="TElement">The base type of the element.</typeparam>
     public abstract class ControllerTypeFinder<TElement> : IControllerTypeFinder<TElement> where TElement : class
     {
-        private readonly IElementKeyFinder<TElement> elementKeyFinder;
-        private readonly IDataContextFinder<TElement> dataContextFinder;
-
         /// <summary>
         /// Gets a filter for the type of the view.
         /// </summary>
@@ -36,10 +33,13 @@ namespace Charites.Windows.Mvc
         /// <param name="dataContextFinder">The finder to find a data context in the view.</param>
         protected ControllerTypeFinder(IElementKeyFinder<TElement> elementKeyFinder, IDataContextFinder<TElement> dataContextFinder)
         {
-            this.elementKeyFinder = elementKeyFinder;
-            this.dataContextFinder = dataContextFinder;
+            KeyFilter = (key, element) =>
+            {
+                if (key == null) return true;
 
-            KeyFilter = (key, element) => key == null || Equals(key, elementKeyFinder?.FindKey(element)) || IsKeyDataContextType(key, dataContextFinder?.Find(element)?.GetType());
+                var elementKey = elementKeyFinder?.FindKey(element);
+                return elementKey == null ? IsKeyDataContextType(key, dataContextFinder?.Find(element)?.GetType()) : Equals(key, elementKey);
+            };
         }
 
         /// <summary>

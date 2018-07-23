@@ -51,7 +51,7 @@ It has two properties as follows:
 The condition to search the controller is as follows:
 
 1. whether the value of the ViewType is equal to the type of the view if the ViewType is specified. If the ViewType is not specified, the controller is the target.
-1. whether the value of the key is equal to the key of the view if the Key is specified. If the key is not specified, the controller is the target. If the key is not equal to the key of the view, search whether the key is equal to:
+1. whether the value of the key is equal to the key of the view if the Key is specified. If the Key is not specified, the controller is the target. If the key of the view is not specified, search whether the Key is equal to:
 
    1. the name of the data context type.
    1. the full name of the data context type.

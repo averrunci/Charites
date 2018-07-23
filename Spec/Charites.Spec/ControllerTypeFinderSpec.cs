@@ -31,6 +31,7 @@ namespace Charites.Windows.Mvc
         void Ex01()
         {
             ElementKeyFinder.FindKey(Element).Returns("TestElement1");
+            DataContextFinder.Find(Element).Returns(new TestControllers.TestDataContext());
 
             When("the element that has the key is specified", () => ControllerTypes = ControllerTypeFinder.Find(Element));
             Then("the found controller types should be ones attributed by the same key, the same type, or no specified", () =>
@@ -48,6 +49,7 @@ namespace Charites.Windows.Mvc
         void Ex02()
         {
             ElementKeyFinder.FindKey(Element).Returns((string)null);
+            DataContextFinder.Find(Element).Returns(null);
 
             When("the element that does not have the key is specified", () => ControllerTypes = ControllerTypeFinder.Find(Element));
             Then("the found controller types should be ones attributed by the same type or no specified", () =>
@@ -62,6 +64,9 @@ namespace Charites.Windows.Mvc
         [Example("When the key is not specified and the view type has the base type")]
         void Ex03()
         {
+            ElementKeyFinder.FindKey(Element).Returns((string)null);
+            DataContextFinder.Find(Element).Returns(null);
+
             When("the element that has the key and has the base type is specified", () => ControllerTypes = ControllerTypeFinder.Find(new DerivedTestElement(null)));
             Then("the found controller types should be ones attributed by the same type, the base type of the same type, or no specified", () =>
                 ControllerTypes.SequenceEqual(new[]
@@ -78,6 +83,7 @@ namespace Charites.Windows.Mvc
         void Ex04()
         {
             ElementKeyFinder.FindKey(Arg.Any<DerivedTestElement>()).Returns("TestElement1");
+            DataContextFinder.Find(Element).Returns(new TestControllers.TestDataContext());
 
             When("the element that has the key and has the base type is specified", () => ControllerTypes = ControllerTypeFinder.Find(new DerivedTestElement(null)));
             Then("the found controller types should be ones attributed by the same key, the same type, the base type of the same type or no specified", () =>
@@ -97,6 +103,7 @@ namespace Charites.Windows.Mvc
         [Sample(Source = typeof(ControllerSpecifiedDataContextSampleDataSource))]
         void Ex05(object dataContext, Type[] expectedControllerTypes)
         {
+            ElementKeyFinder.FindKey(Element).Returns((string)null);
             DataContextFinder.Find(Element).Returns(dataContext);
 
             When("the element that contains the data context", () => ControllerTypes = ControllerTypeFinder.Find(Element));
