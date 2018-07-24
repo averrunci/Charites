@@ -102,8 +102,7 @@ namespace Charites.Windows.Mvc
         {
             if (this.eventName != eventName || handler == null) return;
 
-            var action = handler.Target as EventHandlerAction;
-            if (action?.Handle(sender, e) is Task task)
+            if (Handle(handler, sender, e) is Task task)
             {
                 await task;
             }
@@ -128,5 +127,16 @@ namespace Charites.Windows.Mvc
         /// <param name="element">The element from which the specified event handler is removed.</param>
         /// <param name="handler">The event handler to remove.</param>
         protected abstract void RemoveEventHandler(TElement element, Delegate handler);
+
+        /// <summary>
+        /// Handles the event with the specified object where the event handler is attached
+        /// and event data.
+        /// </summary>
+        /// <param name="handler">The event handler to handle the event.</param>
+        /// <param name="sender">The object where the event handler is attached.</param>
+        /// <param name="e">The event data.</param>
+        /// <returns>An object containing the return value of the handler method.</returns>
+        protected virtual object Handle(Delegate handler, object sender, object e)
+            => (handler.Target as EventHandlerAction)?.Handle(sender, e);
     }
 }
