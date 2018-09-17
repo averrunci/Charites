@@ -47,11 +47,18 @@ namespace Charites.Windows.Mvc
         {
             switch (method.GetParameters().Length)
             {
-                case 0: return method.Invoke(target, null);
-                case 1: return method.Invoke(target, new[] { e });
-                case 2: return method.Invoke(target, new[] { sender, e });
+                case 0: return Handle(null);
+                case 1: return Handle(new[] { e });
+                case 2: return Handle(new[] { sender, e });
                 default: throw new InvalidOperationException("The length of the method parameters must be less than 3.");
             }
         }
+
+        /// <summary>
+        /// Handles the event with the specified parameters.
+        /// </summary>
+        /// <param name="parameters">The parameters to handle the event.</param>
+        /// <returns>An object containing the return value of the invoked method.</returns>
+        protected virtual object Handle(object[] parameters) => method.Invoke(target, parameters);
     }
 }
