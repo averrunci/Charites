@@ -169,11 +169,19 @@ namespace Charites.Windows.Mvc
         {
             if (method == null) return null;
 
-            var action = new EventHandlerAction(method, target);
+            var action = CreateEventHandlerAction(method, target);
             return action.GetType()
                 .GetMethod(nameof(EventHandlerAction.OnHandled))
                 ?.CreateDelegate(handlerType ?? typeof(Handler), action);
         }
+
+        /// <summary>
+        /// Creates an action to handle an event with the specified method and target.
+        /// </summary>
+        /// <param name="method">The method to handle the event.</param>
+        /// <param name="target">The target object to invoke the method to handle the event.</param>
+        /// <returns>The action to handle the event.</returns>
+        protected virtual EventHandlerAction CreateEventHandlerAction(MethodInfo method, object target) => new EventHandlerAction(method, target);
 
         /// <summary>
         /// Handles the process when event handlers are attached.
