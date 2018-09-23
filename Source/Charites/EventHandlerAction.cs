@@ -4,6 +4,7 @@
 // of the MIT license.  See the LICENSE file for details.
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Charites.Windows.Mvc
 {
@@ -57,8 +58,45 @@ namespace Charites.Windows.Mvc
         /// <summary>
         /// Handles the event with the specified parameters.
         /// </summary>
-        /// <param name="parameters">The parameters to handle the event.</param>
+        /// <param name="parameters">The parameters to invoke method.</param>
         /// <returns>An object containing the return value of the invoked method.</returns>
-        protected virtual object Handle(object[] parameters) => method.Invoke(target, parameters);
+        protected virtual object Handle(object[] parameters)
+        {
+            try
+            {
+                var returnValue = method.Invoke(target, parameters);
+                if (returnValue is Task task) Await(task);
+                return returnValue;
+            }
+            catch (Exception exc)
+            {
+                if (!HandleUnhandledException(exc)) throw;
+
+                return null;
+            }
+        }
+
+        private async void Await(Task task)
+        {
+            try
+            {
+                await task;
+            }
+            catch (Exception exc)
+            {
+                if (!HandleUnhandledException(exc)) throw;
+            }
+        }
+
+        /// <summary>
+        /// Handles an unhandled exception that occurred when the action of the event handler is performed.
+        /// </summary>
+        /// <param name="exc">
+        /// An unhandled exception that occurred when the action of the event handler is performed.
+        /// </param>
+        /// <returns>
+        /// <c>true</c> if the exception is handled; otherwise, <c>false</c>.
+        /// </returns>
+        protected virtual bool HandleUnhandledException(Exception exc) => false;
     }
 }

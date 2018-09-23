@@ -5,6 +5,7 @@
 using System;
 using System.Reflection;
 using Carna;
+using NSubstitute;
 
 namespace Charites.Windows.Mvc
 {
@@ -13,8 +14,10 @@ namespace Charites.Windows.Mvc
     {
         EventHandlerAction Action { get; set; }
 
-        object Sender { get; set; } = new object();
-        object Args { get; set; } = new object();
+        Func<Exception, bool> UnhandledExceptionHandler { get; } = Substitute.For<Func<Exception, bool>>();
+
+        object Sender { get; } = new object();
+        object Args { get; } = new object();
 
         bool NoArgumentMethodCalled { get; set; }
         bool OneArgumentMethodCalled { get; set; }
@@ -42,6 +45,21 @@ namespace Charites.Windows.Mvc
         bool ThreeArgumentsMethod(object sender, object e, object param)
         {
             return false;
+        }
+
+        void NoArgumentExceptionMethod()
+        {
+            throw new Exception();
+        }
+
+        void OneArgumentExceptionMethod(object e)
+        {
+            throw new Exception();
+        }
+
+        void TwoArgumentsExceptionMethod(object sender, object e)
+        {
+            throw new Exception();
         }
 
         MethodInfo GetMethodInfo(string name) => GetType().GetMethod(name, BindingFlags.NonPublic | BindingFlags.Instance);
@@ -84,6 +102,66 @@ namespace Charites.Windows.Mvc
             Then<InvalidOperationException>($"{typeof(InvalidOperationException)} should be thrown.");
             When("the EventHandlerAction handles a sender and an event data", () => Result = (bool)Action.Handle(Sender, Args));
             Then<InvalidOperationException>($"{typeof(InvalidOperationException)} should be thrown.");
+        }
+
+        [Example("When a method that has no argument throws an exception and it is handled")]
+        void Ex05()
+        {
+            UnhandledExceptionHandler.Invoke(Arg.Any<TargetInvocationException>()).Returns(true);
+
+            Given("an EventHandlerAction that has a method whose parameter count is zero", () => Action = new ExceptionHandlingEventHandlerAction(GetMethodInfo(nameof(NoArgumentExceptionMethod)), this, UnhandledExceptionHandler));
+            When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
+            Then("the exception should not be thrown", () => true);
+        }
+
+        [Example("When a method that has no argument throws an exception and it is not handled")]
+        void Ex06()
+        {
+            UnhandledExceptionHandler.Invoke(Arg.Any<TargetInvocationException>()).Returns(false);
+
+            Given("an EventHandlerAction that has a method whose parameter count is zero", () => Action = new ExceptionHandlingEventHandlerAction(GetMethodInfo(nameof(NoArgumentExceptionMethod)), this, UnhandledExceptionHandler));
+            When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
+            Then<TargetInvocationException>("the exception should be thrown");
+        }
+
+        [Example("When a method that has one argument throws an exception and it is handled")]
+        void Ex07()
+        {
+            UnhandledExceptionHandler.Invoke(Arg.Any<TargetInvocationException>()).Returns(true);
+
+            Given("an EventHandlerAction that has a method whose parameter count is zero", () => Action = new ExceptionHandlingEventHandlerAction(GetMethodInfo(nameof(OneArgumentExceptionMethod)), this, UnhandledExceptionHandler));
+            When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
+            Then("the exception should not be thrown", () => true);
+        }
+
+        [Example("When a method that has one argument throws an exception and it is not handled")]
+        void Ex08()
+        {
+            UnhandledExceptionHandler.Invoke(Arg.Any<TargetInvocationException>()).Returns(false);
+
+            Given("an EventHandlerAction that has a method whose parameter count is zero", () => Action = new ExceptionHandlingEventHandlerAction(GetMethodInfo(nameof(OneArgumentExceptionMethod)), this, UnhandledExceptionHandler));
+            When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
+            Then<TargetInvocationException>("the exception should be thrown");
+        }
+
+        [Example("When a method that has two arguments throws an exception and it is handled")]
+        void Ex09()
+        {
+            UnhandledExceptionHandler.Invoke(Arg.Any<TargetInvocationException>()).Returns(true);
+
+            Given("an EventHandlerAction that has a method whose parameter count is zero", () => Action = new ExceptionHandlingEventHandlerAction(GetMethodInfo(nameof(TwoArgumentsExceptionMethod)), this, UnhandledExceptionHandler));
+            When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
+            Then("the exception should not be thrown", () => true);
+        }
+
+        [Example("When a method that has two arguments throws an exception and it is not handled")]
+        void Ex10()
+        {
+            UnhandledExceptionHandler.Invoke(Arg.Any<TargetInvocationException>()).Returns(false);
+
+            Given("an EventHandlerAction that has a method whose parameter count is zero", () => Action = new ExceptionHandlingEventHandlerAction(GetMethodInfo(nameof(TwoArgumentsExceptionMethod)), this, UnhandledExceptionHandler));
+            When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
+            Then<TargetInvocationException>("the exception should be thrown");
         }
     }
 }
