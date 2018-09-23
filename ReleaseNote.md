@@ -1,5 +1,11 @@
 # Release note
 
+## V1.1.0
+
+### Add
+
+- Add the virtual method (HandleUnhandledException) to the EventHandlerAction class in order to handle an unhandled exception that occurred in an event handler.
+
 ## V1.0.1
 
 ### Bug fix
