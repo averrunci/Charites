@@ -66,7 +66,7 @@ namespace Charites.Windows.Mvc
         {
             private object dataContext;
 
-            public void SetDataContext(object dataContext) => this.dataContext = dataContext;
+            public void SetDataContextObject(object dataContext) => this.dataContext = dataContext;
 
             public bool AssertDataContext(object expectedDataContext) => dataContext == expectedDataContext;
         }
@@ -76,6 +76,33 @@ namespace Charites.Windows.Mvc
             private object dataContext;
 
             [DataContext]
+            void SetDataContext() { }
+
+            public bool AssertDataContext(object expectedDataContext) => dataContext == expectedDataContext;
+        }
+
+        public class DataContextSpecifiedMethodUsingNamingConventionController : IDataContextAssertController
+        {
+            private object dataContext;
+
+            void SetDataContext(object dataContext) => this.dataContext = dataContext;
+
+            public bool AssertDataContext(object expectedDataContext) => dataContext == expectedDataContext;
+        }
+
+        public class DataContextSpecifiedMethodUsingWrongNamingConventionController : IDataContextAssertController
+        {
+            private object dataContext;
+
+            public void Set_DataContext(object dataContext) => this.dataContext = dataContext;
+
+            public bool AssertDataContext(object expectedDataContext) => dataContext == expectedDataContext;
+        }
+
+        public class DataContextSpecifiedWrongArgumentMethodUsingNamingConventionController : IDataContextAssertController
+        {
+            private object dataContext;
+
             void SetDataContext() { }
 
             public bool AssertDataContext(object expectedDataContext) => dataContext == expectedDataContext;

@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2018 Fievus
+﻿// Copyright (C) 2018-2019 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -52,6 +52,18 @@ namespace Charites.Windows.Mvc
                 .ForEach(method => InjectDataContext(controller, () => method.Invoke(controller, new[] { dataContext })));
 
         /// <summary>
+        /// Injects the specified data context to methods of the specified controller using a naming convention.
+        /// </summary>
+        /// <param name="dataContext">The data context that is injected to the controller.</param>
+        /// <param name="controller">The controller to inject a data context.</param>
+        protected virtual void InjectDataContextToMethodUsingNamingConvention(object dataContext, object controller)
+            => controller.GetType()
+                .GetMethods(DataContextBindingFlags)
+                .Where(method => method.Name == "SetDataContext")
+                .Where(method => method.GetCustomAttribute<DataContextAttribute>(true) == null)
+                .ForEach(method => InjectDataContext(controller, () => method.Invoke(controller, new[] { dataContext })));
+
+        /// <summary>
         /// Injects the specified data context using the specified action.
         /// </summary>
         /// <param name="controller">The controller to inject a data context.</param>
@@ -75,6 +87,7 @@ namespace Charites.Windows.Mvc
             InjectDataContextToField(dataContext, controller);
             InjectDataContextToProperty(dataContext, controller);
             InjectDataContextToMethod(dataContext, controller);
+            InjectDataContextToMethodUsingNamingConvention(dataContext, controller);
         }
     }
 }

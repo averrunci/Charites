@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2018 Fievus
+﻿// Copyright (C) 2018-2019 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -74,6 +74,30 @@ namespace Charites.Windows.Mvc
         void Ex08()
         {
             Given("a controller that has a data context attributed to the method whose parameter is wrong", () => Controller = new TestControllers.DataContextAttributedToWrongArgumentMethodController());
+            When("a data context is injected to the controller", () => DataContextInjector.Inject(DataContext, Controller));
+            Then<DataContextInjectionException>($"{typeof(DataContextInjectionException)} should be thrown");
+        }
+
+        [Example("When a data context is specified by the method using a naming convention")]
+        void Ex09()
+        {
+            Given("a controller that has a data context specified by the method using a naming convention", () => Controller = new TestControllers.DataContextSpecifiedMethodUsingNamingConventionController());
+            When("a data context is injected to the controller", () => DataContextInjector.Inject(DataContext, Controller));
+            Then("the specified data context should be injected to the method of the controller", () => Controller.AssertDataContext(DataContext));
+        }
+
+        [Example("When a data context is specified by the method using a wrong naming convention")]
+        void Ex10()
+        {
+            Given("a controller that has a data context specified by the method using a wrong naming convention", () => Controller = new TestControllers.DataContextSpecifiedMethodUsingWrongNamingConventionController());
+            When("a data context is injected to the controller", () => DataContextInjector.Inject(DataContext, Controller));
+            Then("the specified data context should not be injected to the method of the controller", () => Controller.AssertDataContext(null));
+        }
+
+        [Example("When a data context is specified by the method whose parameter is wrong using a naming convention")]
+        void Ex11()
+        {
+            Given("a controller that has a data context specified by the method whose parameter is wrong using a naming convention", () => Controller = new TestControllers.DataContextSpecifiedWrongArgumentMethodUsingNamingConventionController());
             When("a data context is injected to the controller", () => DataContextInjector.Inject(DataContext, Controller));
             Then<DataContextInjectionException>($"{typeof(DataContextInjectionException)} should be thrown");
         }
