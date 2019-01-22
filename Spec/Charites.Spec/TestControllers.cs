@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2018 Fievus
+﻿// Copyright (C) 2018-2019 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -452,6 +452,114 @@ namespace Charites.Windows.Mvc
             private readonly Action<object, object> twoArgumentsHandler;
 
             public EventHandlerAttributedToWrongArgumentMethodController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
+            {
+                noArgumentHandler = noArgumentAssertionHandler;
+                oneArgumentHandler = oneArgumentAssertionHandler;
+                twoArgumentsHandler = twoArgumentsAssertionHandler;
+            }
+        }
+
+        public class EventHandlerOfMethodUsingNamingConventionController
+        {
+            public void Element1_Click()
+            {
+                noArgumentHandler();
+            }
+            private readonly Action noArgumentHandler;
+
+            private void Element1_Click(object e)
+            {
+                oneArgumentHandler(e);
+            }
+            private void Element2_Click(object e)
+            {
+                oneArgumentHandler(e);
+            }
+            private readonly Action<object> oneArgumentHandler;
+
+            private void Element1_Click(object sender, object e)
+            {
+                twoArgumentsHandler(sender, e);
+            }
+            private void Element2_Click(object sender, object e)
+            {
+                twoArgumentsHandler(sender, e);
+            }
+            private void Element3_Click(object sender, object e)
+            {
+                twoArgumentsHandler(sender, e);
+            }
+            private readonly Action<object, object> twoArgumentsHandler;
+
+            public EventHandlerOfMethodUsingNamingConventionController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
+            {
+                noArgumentHandler = noArgumentAssertionHandler;
+                oneArgumentHandler = oneArgumentAssertionHandler;
+                twoArgumentsHandler = twoArgumentsAssertionHandler;
+            }
+        }
+
+        public class EventHandlerOfMethodUsingWrongNamingConventionController
+        {
+            public void _Element1Click()
+            {
+                noArgumentHandler();
+            }
+            private readonly Action noArgumentHandler;
+
+            private void Element2_Click_(object e)
+            {
+                oneArgumentHandler(e);
+            }
+            private readonly Action<object> oneArgumentHandler;
+
+            private void OnElement3Click(object sender, object e)
+            {
+                twoArgumentsHandler(sender, e);
+            }
+            private readonly Action<object, object> twoArgumentsHandler;
+
+            public EventHandlerOfMethodUsingWrongNamingConventionController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
+            {
+                noArgumentHandler = noArgumentAssertionHandler;
+                oneArgumentHandler = oneArgumentAssertionHandler;
+                twoArgumentsHandler = twoArgumentsAssertionHandler;
+            }
+        }
+
+        public class EventHandlerOfWrongArgumentMethodUsingNamingConventionController
+        {
+            public void Element1_Click(object parameter1, object parameter2, object parameter3)
+            {
+                noArgumentHandler();
+            }
+            private readonly Action noArgumentHandler;
+
+            private void Element1_Click(object e)
+            {
+                oneArgumentHandler(e);
+            }
+            private void Element2_Click(object e)
+            {
+                oneArgumentHandler(e);
+            }
+            private readonly Action<object> oneArgumentHandler;
+
+            private void Element1_Click(object sender, object e)
+            {
+                twoArgumentsHandler(sender, e);
+            }
+            private void Element2_Click(object sender, object e)
+            {
+                twoArgumentsHandler(sender, e);
+            }
+            private void Element3_Click(object sender, object e)
+            {
+                twoArgumentsHandler(sender, e);
+            }
+            private readonly Action<object, object> twoArgumentsHandler;
+
+            public EventHandlerOfWrongArgumentMethodUsingNamingConventionController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
             {
                 noArgumentHandler = noArgumentAssertionHandler;
                 oneArgumentHandler = oneArgumentAssertionHandler;

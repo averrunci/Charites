@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2018 Fievus
+﻿// Copyright (C) 2018-2019 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Charites.Windows.Mvc
 {
@@ -93,6 +94,7 @@ namespace Charites.Windows.Mvc
             RetrieveEventHandlersFromField(controller, element, eventHandlers);
             RetrieveEventHandlersFromProperty(controller, element, eventHandlers);
             RetrieveEventHandlersFromMethod(controller, element, eventHandlers);
+            RetrieveEventHandlersFromMethodUsingNamingConvention(controller, element, eventHandlers);
 
             return eventHandlers;
         }
@@ -133,6 +135,34 @@ namespace Charites.Windows.Mvc
                 .GetMethods(EventHandlerBindingFlags)
                 .Where(method => method.GetCustomAttributes<EventHandlerAttribute>(true).Any())
                 .ForEach(method => AddEventHandlers(method, element, handlerType => CreateEventHandler(method, controller, handlerType), eventHandlers));
+
+        /// <summary>
+        /// Retrieves event handlers from methods that are defined in the specified controller.
+        /// </summary>
+        /// <param name="controller">The controller in which event handlers are defined using a naming convention (ElementName_EventName).</param>
+        /// <param name="element">The element that raises the event.</param>
+        /// <param name="eventHandlers">The <see cref="EventHandlerBase{TElement,TItem}"/> to add retrieved event handlers.</param>
+        protected virtual void RetrieveEventHandlersFromMethodUsingNamingConvention(object controller, TElement element, EventHandlerBase<TElement, TItem> eventHandlers)
+            => controller.GetType()
+                .GetMethods(EventHandlerBindingFlags)
+                .Where(method => EventHandlerNamingConvention.Regex.IsMatch(method.Name))
+                .Where(method => !method.Name.StartsWith("get_"))
+                .Where(method => !method.Name.StartsWith("set_"))
+                .Where(method => !method.GetCustomAttributes<EventHandlerAttribute>(true).Any())
+                .Select(method =>
+                {
+                    var separatorIndex = method.Name.IndexOf("_", StringComparison.Ordinal);
+                    return new
+                    {
+                        MethodInfo = method,
+                        EventHanndlerAttribute = new EventHandlerAttribute
+                        {
+                            ElementName = method.Name.Substring(0, separatorIndex),
+                            Event = method.Name.Substring(separatorIndex + 1)
+                        }
+                    };
+                })
+                .ForEach(x => AddEventHandler(element, x.EventHanndlerAttribute, handlerType => CreateEventHandler(x.MethodInfo, controller, handlerType), eventHandlers));
 
         /// <summary>
         /// Adds event handlers that are defined in the specified <see cref="MemberInfo"/> to the specified <see cref="EventHandlerBase{TElement,TItem}"/>
@@ -218,5 +248,10 @@ namespace Charites.Windows.Mvc
         }
 
         object IControllerExtension<TElement>.Retrieve(object controller) => Retrieve(controller);
+    }
+
+    internal static class EventHandlerNamingConvention
+    {
+        public static readonly Regex Regex = new Regex("^[^_]+_[^_]+$", RegexOptions.Compiled);
     }
 }
