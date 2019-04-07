@@ -95,6 +95,25 @@ private void OnActionButtonClick(object sender, EventArgs e)
 }
 ```
 
+If the method name is "[ElementName]_[EventName]", this attribute does not have to be specified.
+
+``` csharp
+private void ActionButton_Click()
+{
+    // implements the action.
+}
+
+private void ActionButton_Click(EventArgs e)
+{
+    // implements the action.
+}
+
+private void ActionButton_Click(object sender, EventArgs e)
+{
+    // implements the action.
+}
+```
+
 ### DataContextAttribute
 
 This attribute is specified to the field, property, or method to which a data context is injected.
@@ -124,6 +143,16 @@ public void SetContext(DataContexType dataContext)
     this.dataContext = dataContext;
 }
 private DataContexType dataContext;
+```
+
+If the method name is "SetDataContext", this attribute does not have to be specified.
+
+``` csharp
+private void SetDataContext(DataContextType dataContext)
+{
+    this.dataContext = dataContext;
+}
+private DataContextType dataContext;
 ```
 
 ### ElementAttribute

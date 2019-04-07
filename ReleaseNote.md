@@ -1,5 +1,12 @@
 # Release note
 
+## V1.2.0
+
+### Add
+
+- Add the function to set event handlers using a naming convention (ElementName_EventName).
+- Add the function to set a data context using a naming convention (its method name is SetDataContext).
+
 ## V1.1.0
 
 ### Add
