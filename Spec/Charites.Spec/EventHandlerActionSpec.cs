@@ -1,8 +1,9 @@
-﻿// Copyright (C) 2018 Fievus
+﻿// Copyright (C) 2018-2019 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Carna;
 using NSubstitute;
@@ -21,8 +22,18 @@ namespace Charites.Windows.Mvc
 
         bool NoArgumentMethodCalled { get; set; }
         bool OneArgumentMethodCalled { get; set; }
-        bool TwoArgumentMethodCalled { get; set; }
+        bool TwoArgumentsMethodCalled { get; set; }
+        bool DIParametersMethodCalled { get; set; }
+        bool OneArgumentDIParametersMethodCalled { get; set; }
+        bool TwoArgumentsDIParametersMethodCalled { get; set; }
         bool Result { get; set; }
+
+        IDictionary<Type, Func<object>> DIContainer { get; } = new Dictionary<Type, Func<object>>
+        {
+            [typeof(IDependency1)] = () => new Dependency1Implementation(),
+            [typeof(IDependency2)] = () => new Dependency2Implementation(),
+            [typeof(IDependency3)] = () => new Dependency3Implementation()
+        };
 
         bool NoArgumentMethod()
         {
@@ -38,8 +49,8 @@ namespace Charites.Windows.Mvc
 
         bool TwoArgumentsMethod(object sender, object e)
         {
-            TwoArgumentMethodCalled = sender == Sender && e == Args;
-            return TwoArgumentMethodCalled;
+            TwoArgumentsMethodCalled = sender == Sender && e == Args;
+            return TwoArgumentsMethodCalled;
         }
 
         bool ThreeArgumentsMethod(object sender, object e, object param)
@@ -62,14 +73,47 @@ namespace Charites.Windows.Mvc
             throw new Exception();
         }
 
+        bool DIParametersMethod([FromDI] IDependency1 dependency1, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3)
+        {
+            DIParametersMethodCalled = dependency1?.GetType() == typeof(Dependency1Implementation) &&
+                dependency2?.GetType() == typeof(Dependency2Implementation) &&
+                dependency3?.GetType() == typeof(Dependency3Implementation);
+            return DIParametersMethodCalled;
+        }
+
+        bool OneArgumentDIParametersMethod([FromDI] IDependency1 dependency1, object e, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3)
+        {
+            OneArgumentDIParametersMethodCalled = dependency1?.GetType() == typeof(Dependency1Implementation) &&
+                dependency2?.GetType() == typeof(Dependency2Implementation) &&
+                dependency3?.GetType() == typeof(Dependency3Implementation) &&
+                e == Args;
+            return OneArgumentDIParametersMethodCalled;
+        }
+
+        bool TwoArgumentsDIParametersMethod([FromDI] IDependency1 dependency1, object sender, [FromDI] IDependency2 dependency2, object e, [FromDI] IDependency3 dependency3)
+        {
+            TwoArgumentsDIParametersMethodCalled = dependency1?.GetType() == typeof(Dependency1Implementation) &&
+                dependency2?.GetType() == typeof(Dependency2Implementation) &&
+                dependency3?.GetType() == typeof(Dependency3Implementation) &&
+                sender == Sender && e == Args;
+            return TwoArgumentsDIParametersMethodCalled;
+        }
+
         MethodInfo GetMethodInfo(string name) => GetType().GetMethod(name, BindingFlags.NonPublic | BindingFlags.Instance);
+
+        interface IDependency1 { }
+        interface IDependency2 { }
+        interface IDependency3 { }
+        class Dependency1Implementation : IDependency1 { }
+        class Dependency2Implementation : IDependency2 { }
+        class Dependency3Implementation : IDependency3 { }
 
         [Example("When a method has no argument")]
         void Ex01()
         {
             Given("an EventHandlerAction that has a method whose parameter count is zero", () => Action = new EventHandlerAction(GetMethodInfo(nameof(NoArgumentMethod)), this));
             When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
-            Then("the specified method should be invoked", () => NoArgumentMethodCalled && !OneArgumentMethodCalled && !TwoArgumentMethodCalled);
+            Then("the specified method should be invoked", () => NoArgumentMethodCalled && !OneArgumentMethodCalled && !TwoArgumentsMethodCalled);
             When("the EventHandlerAction handles a sender and an event data", () => Result = (bool)Action.Handle(Sender, Args));
             Then("the specified method should be invoked", () => Result);
         }
@@ -79,7 +123,7 @@ namespace Charites.Windows.Mvc
         {
             Given("an EventHandlerAction that has a method whose parameter is an event data", () => Action = new EventHandlerAction(GetMethodInfo(nameof(OneArgumentMethod)), this));
             When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
-            Then("the specified method should be invoked", () => !NoArgumentMethodCalled && OneArgumentMethodCalled && !TwoArgumentMethodCalled);
+            Then("the specified method should be invoked", () => !NoArgumentMethodCalled && OneArgumentMethodCalled && !TwoArgumentsMethodCalled);
             When("the EventHandlerAction handles a sender and an event data", () => Result = (bool)Action.Handle(Sender, Args));
             Then("the specified method should be invoked", () => Result);
         }
@@ -89,7 +133,7 @@ namespace Charites.Windows.Mvc
         {
             Given("an EventHandlerAction that has a method whose parameters are a sender object and an event data", () => Action = new EventHandlerAction(GetMethodInfo(nameof(TwoArgumentsMethod)), this));
             When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
-            Then("the specified method should be invoked", () => !NoArgumentMethodCalled && !OneArgumentMethodCalled && TwoArgumentMethodCalled);
+            Then("the specified method should be invoked", () => !NoArgumentMethodCalled && !OneArgumentMethodCalled && TwoArgumentsMethodCalled);
             When("the EventHandlerAction handles a sender and an event data", () => Result = (bool)Action.Handle(Sender, Args));
             Then("the specified method should be invoked", () => Result);
         }
@@ -162,6 +206,36 @@ namespace Charites.Windows.Mvc
             Given("an EventHandlerAction that has a method whose parameter count is zero", () => Action = new ExceptionHandlingEventHandlerAction(GetMethodInfo(nameof(TwoArgumentsExceptionMethod)), this, UnhandledExceptionHandler));
             When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
             Then<TargetInvocationException>("the exception should be thrown");
+        }
+
+        [Example("When a method has DI parameters")]
+        void Ex11()
+        {
+            Given("an EventHandlerAction that has a method whose parameters are DI parameters", () => Action = new DependencyInjectionEventHandlerAction(GetMethodInfo(nameof(DIParametersMethod)), this, DIContainer));
+            When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
+            Then("the specified method should be invoked", () => !NoArgumentMethodCalled && !OneArgumentMethodCalled && !TwoArgumentsMethodCalled && DIParametersMethodCalled);
+            When("the EventHandlerAction handles a sender and an event data", () => Result = (bool)Action.Handle(Sender, Args));
+            Then("the specified method should be invoked", () => Result);
+        }
+
+        [Example("When a method has one argument and DI parameters")]
+        void Ex12()
+        {
+            Given("an EventHandlerAction that has a method whose parameters are one argument and DI parameters", () => Action = new DependencyInjectionEventHandlerAction(GetMethodInfo(nameof(OneArgumentDIParametersMethod)), this, DIContainer));
+            When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
+            Then("the specified method should be invoked", () => !NoArgumentMethodCalled && !OneArgumentMethodCalled && !TwoArgumentsMethodCalled && OneArgumentDIParametersMethodCalled);
+            When("the EventHandlerAction handles a sender and an event data", () => Result = (bool)Action.Handle(Sender, Args));
+            Then("the specified method should be invoked", () => Result);
+        }
+
+        [Example("When a method has two arguments and DI parameters")]
+        void Ex13()
+        {
+            Given("an EventHandlerAction that has a method whose parameters are two arguments and DI parameters", () => Action = new DependencyInjectionEventHandlerAction(GetMethodInfo(nameof(TwoArgumentsDIParametersMethod)), this, DIContainer));
+            When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
+            Then("the specified method should be invoked", () => !NoArgumentMethodCalled && !OneArgumentMethodCalled && !TwoArgumentsMethodCalled && TwoArgumentsDIParametersMethodCalled);
+            When("the EventHandlerAction handles a sender and an event data", () => Result = (bool)Action.Handle(Sender, Args));
+            Then("the specified method should be invoked", () => Result);
         }
     }
 }
