@@ -3,8 +3,6 @@
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
 using System;
-using System.Collections;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -48,7 +46,7 @@ namespace Charites.Windows.Mvc
         /// <returns>An object containing the return value of the invoked method.</returns>
         public object Handle(object sender, object e)
         {
-            return Handle(ResolveParameters(sender, e));
+            return Handle(CreateParameterDependencyResolver().Resolve(method, sender, e));
         }
 
         /// <summary>
@@ -73,53 +71,10 @@ namespace Charites.Windows.Mvc
         }
 
         /// <summary>
-        /// Resolves parameters with the specified source of the event and event data.
+        /// Creates the resolver to resolve parameters from the dependency injection.
         /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The event data.</param>
-        /// <returns>Parameters of the invoked method.</returns>
-        protected virtual object[] ResolveParameters(object sender, object e)
-        {
-            var parameters = method.GetParameters();
-            var parameterCountExceptDI = parameters.Count(p => p.GetCustomAttribute<FromDIAttribute>() == null);
-            if (parameterCountExceptDI > 2)
-                throw new InvalidOperationException("The length of the method parameters except ones attributed by FromDIAttribute attribute must be less than 3.");
-
-            var specificParameterQueue = new Queue();
-            switch (parameterCountExceptDI)
-            {
-                case 1:
-                    specificParameterQueue.Enqueue(e);
-                    break;
-                case 2:
-                    specificParameterQueue.Enqueue(sender);
-                    specificParameterQueue.Enqueue(e);
-                    break;
-            }
-            return parameters.Select(parameter => ResolveParameter(parameter, specificParameterQueue)).ToArray();
-        }
-
-        /// <summary>
-        /// Resolves a parameter with the specified <see cref="ParameterInfo"/> and queue that
-        /// contains the source of the event and event data.
-        /// </summary>
-        /// <param name="parameter">The <see cref="ParameterInfo"/> from which a parameter is resolved.</param>
-        /// <param name="specificParameterQueue">The queue that contains the source of the event and event data.</param>
-        /// <returns>A parameter of the invoked method.</returns>
-        protected virtual object ResolveParameter(ParameterInfo parameter, Queue specificParameterQueue)
-        {
-            return parameter.GetCustomAttribute<FromDIAttribute>() == null ? specificParameterQueue.Dequeue() : ResolveParameterFromDI(parameter);
-        }
-
-        /// <summary>
-        /// Resolves a parameter with the specified <see cref="ParameterInfo"/> from the dependency injection.
-        /// </summary>
-        /// <param name="parameter">The <see cref="ParameterInfo"/> from which a parameter is resolved.</param>
-        /// <returns>A parameter of the invoked method.</returns>
-        protected virtual object ResolveParameterFromDI(ParameterInfo parameter)
-        {
-            return null;
-        }
+        /// <returns>The resolver to resolve parameters from the dependency injection.</returns>
+        protected virtual IParameterDependencyResolver CreateParameterDependencyResolver() => new ParameterDependencyResolver();
 
         private async void Await(Task task)
         {
