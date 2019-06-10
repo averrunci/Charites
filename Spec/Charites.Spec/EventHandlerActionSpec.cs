@@ -28,7 +28,7 @@ namespace Charites.Windows.Mvc
         bool TwoArgumentsDIParametersMethodCalled { get; set; }
         bool Result { get; set; }
 
-        IDictionary<Type, Func<object>> DIContainer { get; } = new Dictionary<Type, Func<object>>
+        IDictionary<Type, Func<object>> DependencyResolver { get; } = new Dictionary<Type, Func<object>>
         {
             [typeof(IDependency1)] = () => new Dependency1Implementation(),
             [typeof(IDependency2)] = () => new Dependency2Implementation(),
@@ -211,7 +211,7 @@ namespace Charites.Windows.Mvc
         [Example("When a method has DI parameters")]
         void Ex11()
         {
-            Given("an EventHandlerAction that has a method whose parameters are DI parameters", () => Action = new DependencyInjectionEventHandlerAction(GetMethodInfo(nameof(DIParametersMethod)), this, DIContainer));
+            Given("an EventHandlerAction that has a method whose parameters are DI parameters", () => Action = new DependencyInjectionEventHandlerAction(GetMethodInfo(nameof(DIParametersMethod)), this, DependencyResolver));
             When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
             Then("the specified method should be invoked", () => !NoArgumentMethodCalled && !OneArgumentMethodCalled && !TwoArgumentsMethodCalled && DIParametersMethodCalled);
             When("the EventHandlerAction handles a sender and an event data", () => Result = (bool)Action.Handle(Sender, Args));
@@ -221,7 +221,7 @@ namespace Charites.Windows.Mvc
         [Example("When a method has one argument and DI parameters")]
         void Ex12()
         {
-            Given("an EventHandlerAction that has a method whose parameters are one argument and DI parameters", () => Action = new DependencyInjectionEventHandlerAction(GetMethodInfo(nameof(OneArgumentDIParametersMethod)), this, DIContainer));
+            Given("an EventHandlerAction that has a method whose parameters are one argument and DI parameters", () => Action = new DependencyInjectionEventHandlerAction(GetMethodInfo(nameof(OneArgumentDIParametersMethod)), this, DependencyResolver));
             When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
             Then("the specified method should be invoked", () => !NoArgumentMethodCalled && !OneArgumentMethodCalled && !TwoArgumentsMethodCalled && OneArgumentDIParametersMethodCalled);
             When("the EventHandlerAction handles a sender and an event data", () => Result = (bool)Action.Handle(Sender, Args));
@@ -231,7 +231,7 @@ namespace Charites.Windows.Mvc
         [Example("When a method has two arguments and DI parameters")]
         void Ex13()
         {
-            Given("an EventHandlerAction that has a method whose parameters are two arguments and DI parameters", () => Action = new DependencyInjectionEventHandlerAction(GetMethodInfo(nameof(TwoArgumentsDIParametersMethod)), this, DIContainer));
+            Given("an EventHandlerAction that has a method whose parameters are two arguments and DI parameters", () => Action = new DependencyInjectionEventHandlerAction(GetMethodInfo(nameof(TwoArgumentsDIParametersMethod)), this, DependencyResolver));
             When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
             Then("the specified method should be invoked", () => !NoArgumentMethodCalled && !OneArgumentMethodCalled && !TwoArgumentsMethodCalled && TwoArgumentsDIParametersMethodCalled);
             When("the EventHandlerAction handles a sender and an event data", () => Result = (bool)Action.Handle(Sender, Args));

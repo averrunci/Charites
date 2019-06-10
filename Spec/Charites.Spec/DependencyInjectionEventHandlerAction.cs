@@ -10,14 +10,14 @@ namespace Charites.Windows.Mvc
 {
     internal sealed class DependencyInjectionEventHandlerAction : EventHandlerAction
     {
-        private readonly IDictionary<Type, Func<object>> dependencyContainer;
+        private readonly IDictionary<Type, Func<object>> dependencyResolver;
 
-        public DependencyInjectionEventHandlerAction(MethodInfo method, object target, IDictionary<Type, Func<object>> dependencyContainer) : base(method, target)
+        public DependencyInjectionEventHandlerAction(MethodInfo method, object target, IDictionary<Type, Func<object>> dependencyResolver) : base(method, target)
         {
-            this.dependencyContainer = dependencyContainer;
+            this.dependencyResolver = dependencyResolver;
         }
 
         protected override IParameterDependencyResolver CreateParameterDependencyResolver()
-            => new ParameterDependencyResolverTss(dependencyContainer);
+            => new ParameterDependencyResolverTss(dependencyResolver);
     }
 }

@@ -10,16 +10,16 @@ namespace Charites.Windows.Mvc
 {
     internal sealed class ParameterDependencyResolverTss : ParameterDependencyResolver
     {
-        private readonly IDictionary<Type, Func<object>> dependencyContainer;
+        private readonly IDictionary<Type, Func<object>> dependencyResolver;
 
-        public ParameterDependencyResolverTss(IDictionary<Type, Func<object>> dependencyContainer)
+        public ParameterDependencyResolverTss(IDictionary<Type, Func<object>> dependencyResolver)
         {
-            this.dependencyContainer = dependencyContainer;
+            this.dependencyResolver = dependencyResolver;
         }
 
         protected override object ResolveParameterFromDependency(ParameterInfo parameter)
-            => dependencyContainer.ContainsKey(parameter.ParameterType) ?
-                dependencyContainer[parameter.ParameterType]() :
+            => dependencyResolver.ContainsKey(parameter.ParameterType) ?
+                dependencyResolver[parameter.ParameterType]() :
                 base.ResolveParameterFromDependency(parameter);
     }
 }
