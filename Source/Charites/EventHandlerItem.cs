@@ -1,8 +1,9 @@
-﻿// Copyright (C) 2018 Fievus
+﻿// Copyright (C) 2018-2019 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Charites.Windows.Mvc
@@ -75,20 +76,21 @@ namespace Charites.Windows.Mvc
         /// <param name="e">The event data.</param>
         public void Raise(string eventName, object sender, object e)
         {
+            Raise(eventName, sender, e, null);
+        }
+
+        /// <summary>
+        /// Raises the event of the specified name.
+        /// </summary>
+        /// <param name="eventName">The name of the event to raise.</param>
+        /// <param name="sender">the object where the event handler is attached.</param>
+        /// <param name="e">The event data./</param>
+        /// <param name="dependencyResolver">The resolver to resolve dependencies of parameters.</param>
+        public void Raise(string eventName, object sender, object e, IDictionary<Type, Func<object>> dependencyResolver)
+        {
             if (this.eventName != eventName || handler == null) return;
 
-            switch (handler.Method.GetParameters().Length)
-            {
-                case 0:
-                    handler.DynamicInvoke();
-                    break;
-                case 1:
-                    handler.DynamicInvoke(e);
-                    break;
-                case 2:
-                    handler.DynamicInvoke(sender, e);
-                    break;
-            }
+            Handle(handler, sender, e, dependencyResolver);
         }
 
         /// <summary>
@@ -100,12 +102,35 @@ namespace Charites.Windows.Mvc
         /// <returns>A task that represents the asynchronous raise operation.</returns>
         public async Task RaiseAsync(string eventName, object sender, object e)
         {
+            await RaiseAsync(eventName, sender, e, null);
+        }
+
+        /// <summary>
+        /// Raises the event of the specified name asynchronously.
+        /// </summary>
+        /// <param name="eventName">the name of the event to raise.</param>
+        /// <param name="sender">The object where the event handler is attached.</param>
+        /// <param name="e">The event data.</param>
+        /// <param name="dependencyResolver">The resolver to resolve dependencies of parameters.</param>
+        /// <returns>A task that represents the asynchronous raise operation.</returns>
+        public async Task RaiseAsync(string eventName, object sender, object e, IDictionary<Type, Func<object>> dependencyResolver)
+        {
             if (this.eventName != eventName || handler == null) return;
 
-            if (Handle(handler, sender, e) is Task task)
+            if (Handle(handler, sender, e, dependencyResolver) is Task task)
             {
                 await task;
             }
+        }
+
+        /// <summary>
+        /// Creates the resolver to resolve dependencies of parameters.
+        /// </summary>
+        /// <param name="dependencyResolver">The resolver to resolve dependencies of parameter.</param>
+        /// <returns>The resolver to resolve dependencies of parameters.</returns>
+        protected virtual IParameterDependencyResolver CreateParameterDependencyResolver(IDictionary<Type, Func<object>> dependencyResolver)
+        {
+            return new ParameterDependencyResolver(dependencyResolver);
         }
 
         /// <summary>
@@ -137,6 +162,20 @@ namespace Charites.Windows.Mvc
         /// <param name="e">The event data.</param>
         /// <returns>An object containing the return value of the handler method.</returns>
         protected virtual object Handle(Delegate handler, object sender, object e)
-            => (handler.Target as EventHandlerAction)?.Handle(sender, e);
+            => Handle(handler, sender, e, null);
+
+        /// <summary>
+        /// Handles the event with the specified object where the event handler is attached,
+        /// event data, and resolver to resolve dependencies of parameters.
+        /// </summary>
+        /// <param name="handler">The event handler to handle the event.</param>
+        /// <param name="sender">The object where the event handler is attached.</param>
+        /// <param name="e">The event data.</param>
+        /// <param name="dependencyResolver">The resolver to resolve dependencies of parameters.</param>
+        /// <returns>An object containing the return value of the handler method.</returns>
+        protected virtual object Handle(Delegate handler, object sender, object e, IDictionary<Type, Func<object>> dependencyResolver)
+            => handler.Target is EventHandlerAction eventHandlerAction ?
+                eventHandlerAction.Handle(sender, e, dependencyResolver) :
+                handler.DynamicInvoke(CreateParameterDependencyResolver(dependencyResolver).Resolve(handler.Method, sender, e));
     }
 }

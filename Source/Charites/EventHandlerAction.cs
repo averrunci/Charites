@@ -3,6 +3,7 @@
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -46,7 +47,20 @@ namespace Charites.Windows.Mvc
         /// <returns>An object containing the return value of the invoked method.</returns>
         public object Handle(object sender, object e)
         {
-            return Handle(CreateParameterDependencyResolver().Resolve(method, sender, e));
+            return Handle(sender, e, null);
+        }
+
+        /// <summary>
+        /// Handles the event with the specified source of the event, event data, and
+        /// resolver to resolve dependencies of parameters.
+        /// </summary>
+        /// <param name="sender">The source of teh event.</param>
+        /// <param name="e">The event data.</param>
+        /// <param name="dependencyResolver">The resolver to resolve dependencies of parameters.</param>
+        /// <returns>An object containing the return value of the invoked method.</returns>
+        public object Handle(object sender, object e, IDictionary<Type, Func<object>> dependencyResolver)
+        {
+            return Handle(CreateParameterDependencyResolver(dependencyResolver).Resolve(method, sender, e));
         }
 
         /// <summary>
@@ -71,10 +85,14 @@ namespace Charites.Windows.Mvc
         }
 
         /// <summary>
-        /// Creates the resolver to resolve parameters from the dependency injection.
+        /// Creates the resolver to resolve dependencies of parameters.
         /// </summary>
-        /// <returns>The resolver to resolve parameters from the dependency injection.</returns>
-        protected virtual IParameterDependencyResolver CreateParameterDependencyResolver() => new ParameterDependencyResolver();
+        /// <param name="dependencyResolver">The resolver to resolve dependencies of parameter.</param>
+        /// <returns>The resolver to resolve dependencies of parameters.</returns>
+        protected virtual IParameterDependencyResolver CreateParameterDependencyResolver(IDictionary<Type, Func<object>> dependencyResolver)
+        {
+            return new ParameterDependencyResolver(dependencyResolver);
+        }
 
         private async void Await(Task task)
         {

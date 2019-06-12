@@ -7,7 +7,7 @@ using System.Reflection;
 namespace Charites.Windows.Mvc
 {
     /// <summary>
-    /// Provides the function to resolve parameters of the invoked method from the dependency injection.
+    /// Provides the function to resolve dependencies of parameters of the invoked method.
     /// </summary>
     public interface IParameterDependencyResolver
     {

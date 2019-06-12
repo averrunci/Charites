@@ -17,7 +17,7 @@ namespace Charites.Windows.Mvc
             this.dependencyResolver = dependencyResolver;
         }
 
-        protected override IParameterDependencyResolver CreateParameterDependencyResolver()
-            => new ParameterDependencyResolverTss(dependencyResolver);
+        protected override IParameterDependencyResolver CreateParameterDependencyResolver(IDictionary<Type, Func<object>> dependencyResolver)
+            => new ParameterDependencyResolverTss(this.dependencyResolver);
     }
 }

@@ -4,16 +4,36 @@
 // of the MIT license.  See the LICENSE file for details.
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
 namespace Charites.Windows.Mvc
 {
     /// <summary>
-    /// Provides the function to resolve parameters from the dependency injection.
+    /// Provides the function to resolve dependencies of parameters of the invoked method.
     /// </summary>
     public class ParameterDependencyResolver : IParameterDependencyResolver
     {
+        private readonly IDictionary<Type, Func<object>> dependencyResolver;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ParameterDependencyResolver"/> class.
+        /// </summary>
+        public ParameterDependencyResolver()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ParameterDependencyResolver"/> class
+        /// with the specified resolver to resolver dependencies of parameters.
+        /// </summary>
+        /// <param name="dependencyResolver">The resolver to resolve dependencies of parameters.</param>
+        public ParameterDependencyResolver(IDictionary<Type, Func<object>> dependencyResolver)
+        {
+            this.dependencyResolver = dependencyResolver;
+        }
+
         /// <summary>
         /// Resolves parameters with the specified method metadata, source of the event, and event data.
         /// </summary>
@@ -55,13 +75,13 @@ namespace Charites.Windows.Mvc
         }
 
         /// <summary>
-        /// Resolves a parameter with the specified <see cref="ParameterInfo"/> from the dependency injection.
+        /// Resolves a parameter with the specified <see cref="ParameterInfo"/> using the dependency resolver.
         /// </summary>
         /// <param name="parameter">The <see cref="ParameterInfo"/> from which a parameter is resolved.</param>
         /// <returns>A parameter of the invoked method.</returns>
         protected virtual object ResolveParameterFromDependency(ParameterInfo parameter)
         {
-            return null;
+            return dependencyResolver?.ContainsKey(parameter.ParameterType) ?? false ? dependencyResolver[parameter.ParameterType]() : null;
         }
 
         object[] IParameterDependencyResolver.Resolve(MethodInfo method, object sender, object e) => Resolve(method, sender, e);

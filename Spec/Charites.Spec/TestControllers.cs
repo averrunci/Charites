@@ -4,6 +4,7 @@
 // of the MIT license.  See the LICENSE file for details.
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Charites.Windows.Mvc
 {
@@ -593,6 +594,68 @@ namespace Charites.Windows.Mvc
                 twoArgumentsHandler = twoArgumentsAssertionHandler;
             }
         }
+
+        public class EventHandlerOfMethodWithDependencyParametersController
+        {
+            [EventHandler(ElementName = "Element1", Event = "Click")]
+            public void OnElement1Click([FromDI] IDependency1 dependency1, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3)
+            {
+                noArgumentHandler();
+                dependencyArgumentsHandler(dependency1, dependency2, dependency3);
+            }
+            public async Task Element4_Click([FromDI] IDependency1 dependency1, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3)
+            {
+                await Task.Delay(10);
+                noArgumentHandler();
+                dependencyArgumentsHandler(dependency1, dependency2, dependency3);
+            }
+            private readonly Action noArgumentHandler;
+
+            private void Element2_Click([FromDI] IDependency1 dependency1, object e, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3)
+            {
+                oneArgumentHandler(e);
+                dependencyArgumentsHandler(dependency1, dependency2, dependency3);
+            }
+            [EventHandler(ElementName = "Element5", Event = "Click")]
+            private async Task OnElement5Click([FromDI] IDependency1 dependency1, object e, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3)
+            {
+                await Task.Delay(10);
+                oneArgumentHandler(e);
+                dependencyArgumentsHandler(dependency1, dependency2, dependency3);
+            }
+            private readonly Action<object> oneArgumentHandler;
+
+            [EventHandler(ElementName = "Element3", Event = "Click")]
+            private void OnElement3Click([FromDI] IDependency1 dependency1, object sender, [FromDI] IDependency2 dependency2, object e, [FromDI] IDependency3 dependency3)
+            {
+                twoArgumentsHandler(sender, e);
+                dependencyArgumentsHandler(dependency1, dependency2, dependency3);
+            }
+            private async Task Element6_Click([FromDI] IDependency1 dependency1, object sender, [FromDI] IDependency2 dependency2, object e, [FromDI] IDependency3 dependency3)
+            {
+                await Task.Delay(10);
+                twoArgumentsHandler(sender, e);
+                dependencyArgumentsHandler(dependency1, dependency2, dependency3);
+            }
+            private readonly Action<object, object> twoArgumentsHandler;
+
+            private readonly Action<IDependency1, IDependency2, IDependency3> dependencyArgumentsHandler;
+
+            public EventHandlerOfMethodWithDependencyParametersController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler, Action<IDependency1, IDependency2, IDependency3> dependencyArgumentsAssertionHandler)
+            {
+                noArgumentHandler = noArgumentAssertionHandler;
+                oneArgumentHandler = oneArgumentAssertionHandler;
+                twoArgumentsHandler = twoArgumentsAssertionHandler;
+                dependencyArgumentsHandler = dependencyArgumentsAssertionHandler;
+            }
+        }
+
+        public interface IDependency1 { }
+        public interface IDependency2 { }
+        public interface IDependency3 { }
+        public class Dependency1 : IDependency1 { }
+        public class Dependency2 : IDependency2 { }
+        public class Dependency3 : IDependency3 { }
 
         public class DisposableController : IDisposable
         {

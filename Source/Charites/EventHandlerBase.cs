@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2018 Fievus
+﻿// Copyright (C) 2018-2019 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -70,6 +70,8 @@ namespace Charites.Windows.Mvc
             private object sender;
             private object e;
 
+            private readonly IDictionary<Type, Func<object>> dependencyResolver = new Dictionary<Type, Func<object>>();
+
             /// <summary>
             /// Initializes a new instance of the <see cref="Executor"/> class
             /// using the supplied items.
@@ -106,10 +108,22 @@ namespace Charites.Windows.Mvc
             }
 
             /// <summary>
+            /// Resolve a parameter of the specified type using the specified resolver.
+            /// </summary>
+            /// <typeparam name="T">The type of the parameter to inject to.</typeparam>
+            /// <param name="resolver">The function to resolve the parameter of the specified type.</param>
+            /// <returns>The instance of the <see cref="Executor"/></returns>
+            public Executor Resolve<T>(Func<object> resolver)
+            {
+                dependencyResolver[typeof(T)] = resolver;
+                return this;
+            }
+
+            /// <summary>
             /// Raises the event of the specified name.
             /// </summary>
             /// <param name="eventName">The name of the event to raise.</param>
-            public void Raise(string eventName) => items.ForEach(item => item.Raise(eventName, sender, e));
+            public void Raise(string eventName) => items.ForEach(item => item.Raise(eventName, sender, e, dependencyResolver));
 
             /// <summary>
             /// Raises the event of the specified name asynchronously.
@@ -120,7 +134,7 @@ namespace Charites.Windows.Mvc
             {
                 foreach (var item in items)
                 {
-                    await item.RaiseAsync(eventName, sender, e);
+                    await item.RaiseAsync(eventName, sender, e, dependencyResolver);
                 }
             }
         }
