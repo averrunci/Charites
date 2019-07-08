@@ -1,19 +1,30 @@
 # Release note
 
-## V1.2.0
+## v1.3.0
+
+### Add
+
+- Add the FromDIAttribute attribute that is specified to the parameter to inject from the DI container.
+- Add the IPrameterDependencyResolver interface and its implementation class that resolves dependencies of parameters.
+- Add the Resolve method to the EventHandlerBase.Executor class.
+- Add the Raise and RaiseAsync method that have a parameter whose type is the IDictionary<Type, Func&lt;object&gt;> to the EventHandlerItem class.
+- Add the Handle method that has a parameter whose type is the IDictionary<Type, Func&lt;object&gt;> to the EventHandlerAction class.
+- Add the CreateParameterDependencyResolver virtual method that creates an instance that implements the IParameterDependencyResolver to the EventHandlerAction class.
+
+## v1.2.0
 
 ### Add
 
 - Add the function to set event handlers using a naming convention (ElementName_EventName).
 - Add the function to set a data context using a naming convention (its method name is SetDataContext).
 
-## V1.1.0
+## v1.1.0
 
 ### Add
 
 - Add the virtual method (HandleUnhandledException) to the EventHandlerAction class in order to handle an unhandled exception that occurred in an event handler.
 
-## V1.0.1
+## v1.0.1
 
 ### Bug fix
 
