@@ -11,9 +11,9 @@
     <FileVersion>1.3.0</FileVersion>
     <NeutralLanguage>en-US</NeutralLanguage>
     <PackageProjectUrl>https://github.com/averrunci/Charites</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/averrunci/Charites/blob/master/LICENSE</PackageLicenseUrl>
     <PackageTags>charites mvc</PackageTags>
     <Description>The base class library for a desktop application with Model View Controller.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

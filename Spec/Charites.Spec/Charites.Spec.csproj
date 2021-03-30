@@ -12,10 +12,10 @@
     <FileVersion>1.3.0</FileVersion>
     <PackageId>Charites.Spec</PackageId>
     <Product>Charites.Spec</Product>
-    <PackageLicenseUrl>https://github.com/averrunci/Charites/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/averrunci/Charites</PackageProjectUrl>
     <Description>The specification class library for a desktop application with Model View Controller.</Description>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
