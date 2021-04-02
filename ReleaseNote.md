@@ -1,11 +1,17 @@
 # Release note
 
+## v1.3.1
+
+### Add
+
+- Add the IContentNavigator interface and its implementation class that navigates to the content and records the navigation in the ForwardStack or BackwardStack.
+
 ## v1.3.0
 
 ### Add
 
 - Add the FromDIAttribute attribute that is specified to the parameter to inject from the DI container.
-- Add the IPrameterDependencyResolver interface and its implementation class that resolves dependencies of parameters.
+- Add the IParameterDependencyResolver interface and its implementation class that resolves dependencies of parameters.
 - Add the Resolve method to the EventHandlerBase.Executor class.
 - Add the Raise and RaiseAsync method that have a parameter whose type is the IDictionary<Type, Func&lt;object&gt;> to the EventHandlerItem class.
 - Add the Handle method that has a parameter whose type is the IDictionary<Type, Func&lt;object&gt;> to the EventHandlerAction class.
