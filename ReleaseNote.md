@@ -1,5 +1,11 @@
 # Release note
 
+## v1.3.2
+
+### Change
+
+- Modify how to retrieve an event name from a method that represents an event handler using naming convention. If its name ends with "Async", it is ignored.
+
 ## v1.3.1
 
 ### Add
