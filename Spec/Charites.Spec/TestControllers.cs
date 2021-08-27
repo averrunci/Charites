@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2018-2019 Fievus
+﻿// Copyright (C) 2018-2021 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -520,6 +520,52 @@ namespace Charites.Windows.Mvc
             private readonly Action<object, object> twoArgumentsHandler;
 
             public EventHandlerOfMethodUsingNamingConventionController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
+            {
+                noArgumentHandler = noArgumentAssertionHandler;
+                oneArgumentHandler = oneArgumentAssertionHandler;
+                twoArgumentsHandler = twoArgumentsAssertionHandler;
+            }
+        }
+
+        public class EventHandlerOfAsyncMethodUsingNamingConventionController
+        {
+            public Task Element1_ClickAsync()
+            {
+                noArgumentHandler();
+                return Task.CompletedTask;
+            }
+            private readonly Action noArgumentHandler;
+
+            private Task Element1_ClickAsync(object e)
+            {
+                oneArgumentHandler(e);
+                return Task.CompletedTask;
+            }
+            private Task Element2_ClickAsync(object e)
+            {
+                oneArgumentHandler(e);
+                return Task.CompletedTask;
+            }
+            private readonly Action<object> oneArgumentHandler;
+
+            private Task Element1_ClickAsync(object sender, object e)
+            {
+                twoArgumentsHandler(sender, e);
+                return Task.CompletedTask;
+            }
+            private Task Element2_ClickAsync(object sender, object e)
+            {
+                twoArgumentsHandler(sender, e);
+                return Task.CompletedTask;
+            }
+            private Task Element3_ClickAsync(object sender, object e)
+            {
+                twoArgumentsHandler(sender, e);
+                return Task.CompletedTask;
+            }
+            private readonly Action<object, object> twoArgumentsHandler;
+
+            public EventHandlerOfAsyncMethodUsingNamingConventionController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
             {
                 noArgumentHandler = noArgumentAssertionHandler;
                 oneArgumentHandler = oneArgumentAssertionHandler;

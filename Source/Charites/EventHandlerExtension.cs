@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2018-2019 Fievus
+﻿// Copyright (C) 2018-2021 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -158,11 +158,24 @@ namespace Charites.Windows.Mvc
                         EventHanndlerAttribute = new EventHandlerAttribute
                         {
                             ElementName = method.Name.Substring(0, separatorIndex),
-                            Event = method.Name.Substring(separatorIndex + 1)
+                            Event = EnsureEventNameUsingNamingConvention(method.Name.Substring(separatorIndex + 1))
                         }
                     };
                 })
                 .ForEach(x => AddEventHandler(element, x.EventHanndlerAttribute, handlerType => CreateEventHandler(x.MethodInfo, controller, handlerType), eventHandlers));
+
+        protected virtual bool FilterMethodUsingNamingConvention(MethodInfo method)
+            => EventHandlerNamingConvention.Regex.IsMatch(method.Name) &&
+                !method.Name.StartsWith("get_") &&
+                !method.Name.StartsWith("set_") &&
+                !method.GetCustomAttributes<EventHandlerAttribute>(true).Any();
+
+        /// <summary>
+        /// Ensures an event name defined using a naming convention (ElementName_EventName).
+        /// </summary>
+        /// <param name="eventName">The event name.</param>
+        /// <returns>The ensured event name.</returns>
+        protected virtual string EnsureEventNameUsingNamingConvention(string eventName) => eventName.EndsWith("Async") ? eventName.Substring(0, eventName.Length - 5) : eventName;
 
         /// <summary>
         /// Adds event handlers that are defined in the specified <see cref="MemberInfo"/> to the specified <see cref="EventHandlerBase{TElement,TItem}"/>

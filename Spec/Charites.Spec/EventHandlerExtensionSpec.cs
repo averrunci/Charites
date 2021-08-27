@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2018-2019 Fievus
+﻿// Copyright (C) 2018-2021 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -264,8 +264,40 @@ namespace Charites.Windows.Mvc
             Then("the event should not be handled", () => AssertEventHandlerCalled(false, false, false));
         }
 
-        [Example("When event handlers are methods using a wrong naming convention")]
+        [Example("When event handlers are async methods using a naming convention")]
         void Ex10()
+        {
+            Given("a controller that has event handlers of the async method using a naming convention", () => Controller = new TestControllers.EventHandlerOfAsyncMethodUsingNamingConventionController(NoArgumentAssertionHandler, OneArgumentAssertionHandler, TwoArgumentsAssertionHandler));
+            When("the controller is attached", () => EventHandlerExtension.Attach(Controller, RootElement));
+            When("the EventHandlerBase is retrieved", () => EventHandlerBase = (EventHandlerBase<TestElement, EventHandlerItemTss>)EventHandlerExtension.Retrieve(Controller));
+
+            When("the event is raised", async () => await EventHandlerBase.GetBy("Element1").RaiseAsync("Click"));
+            Then("the event should be handled", () => AssertEventHandlerCalled(true, true, true));
+            Args = new object();
+            When("the event is raised with an event data", async () => await EventHandlerBase.GetBy("Element2").With(Args).RaiseAsync("Click"));
+            Then("the event should be handled", () => AssertEventHandlerCalled(false, true, true));
+            Sender = new object();
+            When("the event is raised with a sender object and event data", async () => await EventHandlerBase.GetBy("Element3").From(Sender).With(Args).RaiseAsync("Click"));
+            Then("the event should be handled", () => AssertEventHandlerCalled(false, false, true));
+
+            When("the controller is detached", () => EventHandlerExtension.Detach(Controller, RootElement));
+            When("the EventHandlerBase is retrieved", () => EventHandlerBase = (EventHandlerBase<TestElement, EventHandlerItemTss>)EventHandlerExtension.Retrieve(Controller));
+
+            Sender = null;
+            Args = null;
+
+            When("the event is raised", async () => await EventHandlerBase.GetBy("Element1").RaiseAsync("Click"));
+            Then("the event should not be handled", () => AssertEventHandlerCalled(false, false, false));
+            Args = new object();
+            When("the event is raised with an event data", async () => await EventHandlerBase.GetBy("Element2").With(Args).RaiseAsync("Click"));
+            Then("the event should not be handled", () => AssertEventHandlerCalled(false, false, false));
+            Sender = new object();
+            When("the event is raised with a sender object and event data", async () => await EventHandlerBase.GetBy("Element3").From(Sender).With(Args).RaiseAsync("Click"));
+            Then("the event should not be handled", () => AssertEventHandlerCalled(false, false, false));
+        }
+
+        [Example("When event handlers are methods using a wrong naming convention")]
+        void Ex11()
         {
             Given("a controller that has event handlers of the method using a wrong naming convention", () => Controller = new TestControllers.EventHandlerOfMethodUsingWrongNamingConventionController(NoArgumentAssertionHandler, OneArgumentAssertionHandler, TwoArgumentsAssertionHandler));
             When("the controller is attached", () => EventHandlerExtension.Attach(Controller, RootElement));
@@ -282,7 +314,7 @@ namespace Charites.Windows.Mvc
         }
 
         [Example("When event handlers are methods whose parameter are wrong using a naming convention")]
-        void Ex11()
+        void Ex12()
         {
             Given("a controller that has event handlers of the method whose parameter is wrong using a naming convention", () => Controller = new TestControllers.EventHandlerOfWrongArgumentMethodUsingNamingConventionController(NoArgumentAssertionHandler, OneArgumentAssertionHandler, TwoArgumentsAssertionHandler));
             When("the controller is attached", () => EventHandlerExtension.Attach(Controller, RootElement));
@@ -293,7 +325,7 @@ namespace Charites.Windows.Mvc
         }
 
         [Example("When event handlers are methods that have dependency parameters")]
-        void Ex12()
+        void Ex13()
         {
             Given("a controller that has event handlers of the method that have dependency parameters", () => Controller = new TestControllers.EventHandlerOfMethodWithDependencyParametersController(NoArgumentAssertionHandler, OneArgumentAssertionHandler, TwoArgumentsAssertionHandler, DependencyArgumentsAssertionHandler));
             When("the controller is attached", () => EventHandlerExtension.Attach(Controller, RootElement));
