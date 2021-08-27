@@ -145,10 +145,7 @@ namespace Charites.Windows.Mvc
         protected virtual void RetrieveEventHandlersFromMethodUsingNamingConvention(object controller, TElement element, EventHandlerBase<TElement, TItem> eventHandlers)
             => controller.GetType()
                 .GetMethods(EventHandlerBindingFlags)
-                .Where(method => EventHandlerNamingConvention.Regex.IsMatch(method.Name))
-                .Where(method => !method.Name.StartsWith("get_"))
-                .Where(method => !method.Name.StartsWith("set_"))
-                .Where(method => !method.GetCustomAttributes<EventHandlerAttribute>(true).Any())
+                .Where(FilterMethodUsingNamingConvention)
                 .Select(method =>
                 {
                     var separatorIndex = method.Name.IndexOf("_", StringComparison.Ordinal);
@@ -164,6 +161,11 @@ namespace Charites.Windows.Mvc
                 })
                 .ForEach(x => AddEventHandler(element, x.EventHanndlerAttribute, handlerType => CreateEventHandler(x.MethodInfo, controller, handlerType), eventHandlers));
 
+        /// <summary>
+        /// Filters the specified <see cref="MethodInfo"/> to match the naming convention.
+        /// </summary>
+        /// <param name="method">The <see cref="MethodInfo"/> to filter.</param>
+        /// <returns><c>True</c> if the specified <see cref="MethodInfo"/> matches the naming convention; otherwise, <c>false</c>.</returns>
         protected virtual bool FilterMethodUsingNamingConvention(MethodInfo method)
             => EventHandlerNamingConvention.Regex.IsMatch(method.Name) &&
                 !method.Name.StartsWith("get_") &&
