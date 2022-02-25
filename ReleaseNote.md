@@ -1,5 +1,12 @@
 # Release note
 
+## v2.0.0
+
+### Change
+
+- Update the target framework version to .NET 6.0.
+- Enable Nullable reference types.
+
 ## v1.3.2
 
 ### Change

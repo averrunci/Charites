@@ -89,7 +89,7 @@ private void OnActionButtonClick(EventArgs e)
 
 ``` csharp
 [EventHandler(ElementName = "ActionButton", Event = "Click")]
-private void OnActionButtonClick(object sender, EventArgs e)
+private void OnActionButtonClick(object? sender, EventArgs e)
 {
     // implements the action.
 }
@@ -108,7 +108,7 @@ private void ActionButton_Click(EventArgs e)
     // implements the action.
 }
 
-private void ActionButton_Click(object sender, EventArgs e)
+private void ActionButton_Click(object? sender, EventArgs e)
 {
     // implements the action.
 }
@@ -127,7 +127,7 @@ private async Task ActionButton_ClickAsync(EventArgs e)
     // implements the action.
 }
 
-private async Task ActionButton_ClickAsync(object sender, EventArgs e)
+private async Task ActionButton_ClickAsync(object? sender, EventArgs e)
 {
     // implements the action.
 }
@@ -148,7 +148,7 @@ private void ActionButton_Click(EventArgs e, [FromDI] IDataLoader dataLoader)
     // implements the action.
 }
 
-private void ActionButton_Click(object sender, EventArgs e, [FromDI] IDataLoader dataLoader)
+private void ActionButton_Click(object? sender, EventArgs e, [FromDI] IDataLoader dataLoader)
 {
     // implements the action.
 }
@@ -164,35 +164,35 @@ The implementation is as follows;
 
 ``` csharp
 [DataContext]
-private DataContexType dataContext;
+private DataContexType? dataContext;
 ```
 
 - Property
 
 ``` csharp
 [DataContext]
-public DataContexType DataContext { get; set; }
+public DataContexType? DataContext { get; set; }
 ```
 
 - Method
 
 ``` csharp
 [DataContext]
-public void SetContext(DataContexType dataContext)
+public void SetContext(DataContexType? dataContext)
 {
     this.dataContext = dataContext;
 }
-private DataContexType dataContext;
+private DataContexType? dataContext;
 ```
 
 If the method name is "SetDataContext", this attribute does not have to be specified.
 
 ``` csharp
-private void SetDataContext(DataContextType dataContext)
+private void SetDataContext(DataContextType? dataContext)
 {
     this.dataContext = dataContext;
 }
-private DataContextType dataContext;
+private DataContextType? dataContext;
 ```
 
 ### ElementAttribute
@@ -209,25 +209,25 @@ The implementation to inject an element whose name is "Element" is as follows;
 
 ``` csharp
 [Element(Name = "Element")]
-private ElementType element;
+private ElementType? element;
 ```
 
 - Property
 
 ``` csharp
 [Element]
-public ElementType Element { get; set; }
+public ElementType? Element { get; set; }
 ```
 
 - Method
 
 ``` csharp
 [Element]
-public void SetElement(ElementType element)
+public void SetElement(ElementType? element)
 {
     this.element = element;
 }
-private ElementType element;
+private ElementType? element;
 ```
 
 ## NuGet
