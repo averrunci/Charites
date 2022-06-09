@@ -17,6 +17,25 @@ public abstract class ElementInjector<TElement> : IElementInjector<TElement> whe
     /// </summary>
     protected virtual BindingFlags ElementBindingFlags => BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
 
+    private readonly IElementFinder<TElement>? elementFinder;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ElementInjector{TElement}"/> class.
+    /// </summary>
+    protected ElementInjector()
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ElementInjector{TElement}"/> class
+    /// with the specified finder to find an element in a view.
+    /// </summary>
+    /// <param name="elementFinder">The finder to find an element in  a view.</param>
+    protected ElementInjector(IElementFinder<TElement> elementFinder)
+    {
+        this.elementFinder = elementFinder;
+    }
+
     /// <summary>
     /// Finds an element of the specified name in the specified element.
     /// </summary>
@@ -26,7 +45,7 @@ public abstract class ElementInjector<TElement> : IElementInjector<TElement> whe
     /// The element of the specified name in the specified element.
     /// If not found, <c>null</c> is returned.
     /// </returns>
-    protected abstract object? FindElement(TElement? rootElement, string elementName);
+    protected virtual object? FindElement(TElement? rootElement, string elementName) => elementFinder?.FindElement(rootElement, elementName);
 
     /// <summary>
     /// Injects elements in the specified element to fields of the specified controller.
