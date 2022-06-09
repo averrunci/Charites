@@ -21,17 +21,23 @@ class EventHandlerActionSpec : FixtureSteppable
     bool NoArgumentMethodCalled { get; set; }
     bool OneArgumentMethodCalled { get; set; }
     bool TwoArgumentsMethodCalled { get; set; }
-    bool DIParametersMethodCalled { get; set; }
-    bool OneArgumentDIParametersMethodCalled { get; set; }
-    bool TwoArgumentsDIParametersMethodCalled { get; set; }
+    bool AttributedParametersMethodCalled { get; set; }
+    bool OneArgumentAttributedParametersMethodCalled { get; set; }
+    bool TwoArgumentsAttributedParametersMethodCalled { get; set; }
     bool Result { get; set; }
 
-    IDictionary<Type, Func<object?>> DependencyResolver { get; } = new Dictionary<Type, Func<object?>>
-    {
-        [typeof(IDependency1)] = () => new Dependency1Implementation(),
-        [typeof(IDependency2)] = () => new Dependency2Implementation(),
-        [typeof(IDependency3)] = () => new Dependency3Implementation()
-    };
+    IParameterDependencyResolver ParameterResolver { get; } = new ParameterDependencyResolver(
+        Enumerable.Empty<IEventHandlerParameterResolver>(),
+        new Dictionary<Type, IDictionary<Type, Func<object?>>>
+        {
+            [typeof(FromDIAttribute)] = new Dictionary<Type, Func<object?>>
+            {
+                [typeof(IDependency1)] = () => new Dependency1Implementation(),
+                [typeof(IDependency2)] = () => new Dependency2Implementation(),
+                [typeof(IDependency3)] = () => new Dependency3Implementation()
+            }
+        }
+    );
 
     bool NoArgumentMethod()
     {
@@ -71,30 +77,30 @@ class EventHandlerActionSpec : FixtureSteppable
         throw new Exception();
     }
 
-    bool DIParametersMethod([FromDI] IDependency1 dependency1, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3)
+    bool AttributedParametersMethod([FromDI] IDependency1 dependency1, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3)
     {
-        DIParametersMethodCalled = dependency1.GetType() == typeof(Dependency1Implementation) &&
+        AttributedParametersMethodCalled = dependency1.GetType() == typeof(Dependency1Implementation) &&
             dependency2.GetType() == typeof(Dependency2Implementation) &&
             dependency3.GetType() == typeof(Dependency3Implementation);
-        return DIParametersMethodCalled;
+        return AttributedParametersMethodCalled;
     }
 
-    bool OneArgumentDIParametersMethod([FromDI] IDependency1 dependency1, object e, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3)
+    bool OneArgumentAttributedParametersMethod([FromDI] IDependency1 dependency1, object e, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3)
     {
-        OneArgumentDIParametersMethodCalled = dependency1.GetType() == typeof(Dependency1Implementation) &&
+        OneArgumentAttributedParametersMethodCalled = dependency1.GetType() == typeof(Dependency1Implementation) &&
             dependency2.GetType() == typeof(Dependency2Implementation) &&
             dependency3.GetType() == typeof(Dependency3Implementation) &&
             e == Args;
-        return OneArgumentDIParametersMethodCalled;
+        return OneArgumentAttributedParametersMethodCalled;
     }
 
-    bool TwoArgumentsDIParametersMethod([FromDI] IDependency1 dependency1, object sender, [FromDI] IDependency2 dependency2, object e, [FromDI] IDependency3 dependency3)
+    bool TwoArgumentsAttributedParametersMethod([FromDI] IDependency1 dependency1, object sender, [FromDI] IDependency2 dependency2, object e, [FromDI] IDependency3 dependency3)
     {
-        TwoArgumentsDIParametersMethodCalled = dependency1.GetType() == typeof(Dependency1Implementation) &&
+        TwoArgumentsAttributedParametersMethodCalled = dependency1.GetType() == typeof(Dependency1Implementation) &&
             dependency2.GetType() == typeof(Dependency2Implementation) &&
             dependency3.GetType() == typeof(Dependency3Implementation) &&
             sender == Sender && e == Args;
-        return TwoArgumentsDIParametersMethodCalled;
+        return TwoArgumentsAttributedParametersMethodCalled;
     }
 
     MethodInfo GetMethodInfo(string name) => GetType().GetMethod(name, BindingFlags.NonPublic | BindingFlags.Instance) ?? throw new InvalidOperationException();
@@ -206,32 +212,32 @@ class EventHandlerActionSpec : FixtureSteppable
         Then<TargetInvocationException>("the exception should be thrown");
     }
 
-    [Example("When a method has DI parameters")]
+    [Example("When a method has parameters specified by the attribute")]
     void Ex11()
     {
-        Given("an EventHandlerAction that has a method whose parameters are DI parameters", () => Action = new DependencyInjectionEventHandlerAction(GetMethodInfo(nameof(DIParametersMethod)), this, DependencyResolver));
+        Given("an EventHandlerAction that has a method whose parameters are specified by the attribute", () => Action = new EventHandlerAction(GetMethodInfo(nameof(AttributedParametersMethod)), this, ParameterResolver));
         When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
-        Then("the specified method should be invoked", () => !NoArgumentMethodCalled && !OneArgumentMethodCalled && !TwoArgumentsMethodCalled && DIParametersMethodCalled);
+        Then("the specified method should be invoked", () => !NoArgumentMethodCalled && !OneArgumentMethodCalled && !TwoArgumentsMethodCalled && AttributedParametersMethodCalled);
         When("the EventHandlerAction handles a sender and an event data", () => Result = (bool)(Action.Handle(Sender, Args) ?? false));
         Then("the specified method should be invoked", () => Result);
     }
 
-    [Example("When a method has one argument and DI parameters")]
+    [Example("When a method has one argument and parameters specified by the attribute")]
     void Ex12()
     {
-        Given("an EventHandlerAction that has a method whose parameters are one argument and DI parameters", () => Action = new DependencyInjectionEventHandlerAction(GetMethodInfo(nameof(OneArgumentDIParametersMethod)), this, DependencyResolver));
+        Given("an EventHandlerAction that has a method whose parameters are one argument and parameters specified by the attribute", () => Action = new EventHandlerAction(GetMethodInfo(nameof(OneArgumentAttributedParametersMethod)), this, ParameterResolver));
         When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
-        Then("the specified method should be invoked", () => !NoArgumentMethodCalled && !OneArgumentMethodCalled && !TwoArgumentsMethodCalled && OneArgumentDIParametersMethodCalled);
+        Then("the specified method should be invoked", () => !NoArgumentMethodCalled && !OneArgumentMethodCalled && !TwoArgumentsMethodCalled && OneArgumentAttributedParametersMethodCalled);
         When("the EventHandlerAction handles a sender and an event data", () => Result = (bool)(Action.Handle(Sender, Args) ?? false));
         Then("the specified method should be invoked", () => Result);
     }
 
-    [Example("When a method has two arguments and DI parameters")]
+    [Example("When a method has two arguments and parameters specified by the attribute")]
     void Ex13()
     {
-        Given("an EventHandlerAction that has a method whose parameters are two arguments and DI parameters", () => Action = new DependencyInjectionEventHandlerAction(GetMethodInfo(nameof(TwoArgumentsDIParametersMethod)), this, DependencyResolver));
+        Given("an EventHandlerAction that has a method whose parameters are two arguments and parameters specified by the attribute", () => Action = new EventHandlerAction(GetMethodInfo(nameof(TwoArgumentsAttributedParametersMethod)), this, ParameterResolver));
         When("a sender and an event data are handled", () => Action.OnHandled(Sender, Args));
-        Then("the specified method should be invoked", () => !NoArgumentMethodCalled && !OneArgumentMethodCalled && !TwoArgumentsMethodCalled && TwoArgumentsDIParametersMethodCalled);
+        Then("the specified method should be invoked", () => !NoArgumentMethodCalled && !OneArgumentMethodCalled && !TwoArgumentsMethodCalled && TwoArgumentsAttributedParametersMethodCalled);
         When("the EventHandlerAction handles a sender and an event data", () => Result = (bool)(Action.Handle(Sender, Args) ?? false));
         Then("the specified method should be invoked", () => Result);
     }

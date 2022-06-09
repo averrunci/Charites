@@ -20,6 +20,39 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
     protected virtual BindingFlags EventHandlerBindingFlags => BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
 
     /// <summary>
+    /// Gets the resolver to resolve parameters of an event handler.
+    /// </summary>
+    protected IEnumerable<Type> ParameterResolverTypes => parameterResolverTypes;
+    private readonly List<Type> parameterResolverTypes = new();
+
+    /// <summary>
+    /// Adds the specified type of a resolver to resolve of parameters of an event handler.
+    /// </summary>
+    /// <typeparam name="TResolver">The type of a resolver to resolve of parameters of an event handler.</typeparam>
+    public void Add<TResolver>() where TResolver : IEventHandlerParameterResolver => Add(typeof(TResolver));
+
+    /// <summary>
+    /// Adds the specified type of a resolver to resolve of parameters of an event handler.
+    /// </summary>
+    /// <param name="resolverType">The type of a resolver to resolve of parameters of an event handler.</param>
+    /// <exception cref="ArgumentException">
+    /// The <paramref name="resolverType"/> does not implement the <see cref="IEventHandlerParameterResolver"/> interface.
+    /// </exception>
+    public void Add(Type resolverType) => AddParameterResolverType(resolverType);
+
+    /// <summary>
+    /// Removes the specified type of a resolver to resolve of parameters of an event handler.
+    /// </summary>
+    /// <typeparam name="TResolver">The type of a resolver to resolve of parameters of an event handler.</typeparam>
+    public void Remove<TResolver>() where TResolver : IEventHandlerParameterResolver => Remove(typeof(TResolver));
+
+    /// <summary>
+    /// Removes the specified type of a resolver to resolve of parameters of an event handler.
+    /// </summary>
+    /// <param name="resolverType">The type of a resolver to resolve of parameters of an event handler.</param>
+    public virtual void Remove(Type resolverType) => RemoveParameterResolverType(resolverType);
+
+    /// <summary>
     /// Ensures <see cref="EventHandlerBase{TElement,TItem}"/> associated with the specified element.
     /// </summary>
     /// <param name="element">The element that associates <see cref="EventHandlerBase{TElement,TItem}"/>.</param>
@@ -38,6 +71,32 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
     /// <param name="handlerCreator">The function to create a delegate of the event handler.</param>
     /// <param name="eventHandlers">The <see cref="EventHandlerBase{TElement,TItem}"/> to add the event handler.</param>
     protected abstract void AddEventHandler(TElement? element, EventHandlerAttribute eventHandlerAttribute, Func<Type?, Delegate?> handlerCreator, EventHandlerBase<TElement, TItem> eventHandlers);
+
+    /// <summary>
+    /// Adds the specified type of a resolver to resolve of parameters of an event handler.
+    /// </summary>
+    /// <param name="resolverType">The type of a resolver to resolve of parameters of an event handler.</param>
+    /// <exception cref="ArgumentException">
+    /// The <paramref name="resolverType"/> does not implement the <see cref="IEventHandlerParameterResolver"/> interface,
+    /// is not a class, or is an abstract.
+    /// </exception>
+    protected virtual void AddParameterResolverType(Type resolverType)
+    {
+        if (!typeof(IEventHandlerParameterResolver).IsAssignableFrom(resolverType))
+            throw new ArgumentException($"The resolver type ({resolverType}) must implement the {typeof(IEventHandlerParameterResolver)} interface.", nameof(resolverType));
+        if (!resolverType.IsClass) throw new ArgumentException($"The resolver type ({resolverType}) must be a class.", nameof(resolverType));
+        if (resolverType.IsAbstract) throw new ArgumentException($"The resolver type ({resolverType}) must not be an abstract.", nameof(resolverType));
+        if (parameterResolverTypes.Contains(resolverType)) return;
+
+        parameterResolverTypes.Add(resolverType);
+    }
+
+    /// <summary>
+    /// Removes the specified type of a resolver to resolve of parameters of an event handler.
+    /// </summary>
+    /// <param name="resolverType">The type of a resolver to resolve of parameters of an event handler.</param>
+    protected virtual void RemoveParameterResolverType(Type resolverType) => parameterResolverTypes.Remove(resolverType);
+
 
     /// <summary>
     /// Adds event handlers to the specified element.
@@ -218,7 +277,19 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
     /// <param name="method">The method to handle the event.</param>
     /// <param name="target">The target object to invoke the method to handle the event.</param>
     /// <returns>The action to handle the event.</returns>
-    protected virtual EventHandlerAction CreateEventHandlerAction(MethodInfo method, object? target) => new(method, target);
+    protected virtual EventHandlerAction CreateEventHandlerAction(MethodInfo method, object? target)
+        => new(method, target, new ParameterDependencyResolver(CreateParameterResolver()));
+
+    /// <summary>
+    /// Creates a resolver to resolve parameters of an event handler.
+    /// </summary>
+    /// <returns>The resolver to resolve parameters of an event handler.</returns>
+    protected virtual IEnumerable<IEventHandlerParameterResolver> CreateParameterResolver()
+        => ParameterResolverTypes
+            .Where(t => t.IsClass && !t.IsAbstract)
+            .Select(t => Activator.CreateInstance(t) as IEventHandlerParameterResolver)
+            .OfType<IEventHandlerParameterResolver>()
+            .ToList();
 
     /// <summary>
     /// Handles the process when event handlers are attached.

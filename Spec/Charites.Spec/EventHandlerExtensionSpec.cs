@@ -2,6 +2,7 @@
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
+using System.Reflection;
 using Carna;
 
 namespace Charites.Windows.Mvc;
@@ -33,6 +34,20 @@ class EventHandlerExtensionSpec : FixtureSteppable
     TestControllers.IDependency2 Dependency2 { get; } = new TestControllers.Dependency2();
     TestControllers.IDependency3 Dependency3 { get; } = new TestControllers.Dependency3();
 
+
+    class TestEventHandlerParameterResolver1 : IEventHandlerParameterResolver
+    {
+        object? IEventHandlerParameterResolver.Resolve(ParameterInfo parameter) => null;
+    }
+    class TestEventHandlerParameterResolver2 : IEventHandlerParameterResolver
+    {
+        object? IEventHandlerParameterResolver.Resolve(ParameterInfo parameter) => null;
+    }
+    class TestEventHandlerParameterResolver3 : IEventHandlerParameterResolver
+    {
+        object? IEventHandlerParameterResolver.Resolve(ParameterInfo parameter) => null;
+    }
+    interface ITestEventHandlerParameterResolver : IEventHandlerParameterResolver { }
 
     public EventHandlerExtensionSpec()
     {
@@ -323,26 +338,26 @@ class EventHandlerExtensionSpec : FixtureSteppable
         Then<InvalidOperationException>($"{typeof(InvalidOperationException)} should be thrown", exc => exc.GetType() == typeof(InvalidOperationException));
     }
 
-    [Example("When event handlers are methods that have dependency parameters")]
+    [Example("When event handlers are methods that have parameters specified by the attribute")]
     void Ex13()
     {
-        Given("a controller that has event handlers of the method that have dependency parameters", () => Controller = new TestControllers.EventHandlerOfMethodWithDependencyParametersController(NoArgumentAssertionHandler, OneArgumentAssertionHandler, TwoArgumentsAssertionHandler, DependencyArgumentsAssertionHandler));
+        Given("a controller that has event handlers of the method that have parameters specified by the attribute", () => Controller = new TestControllers.EventHandlerOfMethodWithParametersSpecifiedByAttributeController(NoArgumentAssertionHandler, OneArgumentAssertionHandler, TwoArgumentsAssertionHandler, DependencyArgumentsAssertionHandler));
         When("the controller is attached", () => EventHandlerExtension.Attach(Controller, RootElement));
         When("the EventHandlerBase is retrieved", () => EventHandlerBase = (EventHandlerBase<TestElement, EventHandlerItemTss>)EventHandlerExtension.Retrieve(Controller));
 
         When("the event is raised", () =>
             EventHandlerBase.GetBy("Element1")
-                .Resolve<TestControllers.IDependency1>(() => Dependency1)
-                .Resolve<TestControllers.IDependency2>(() => Dependency2)
-                .Resolve<TestControllers.IDependency3>(() => Dependency3)
+                .Resolve<FromDIAttribute, TestControllers.IDependency1>(() => Dependency1)
+                .Resolve<FromDIAttribute, TestControllers.IDependency2>(() => Dependency2)
+                .Resolve<FromDIAttribute, TestControllers.IDependency3>(() => Dependency3)
                 .Raise("Click")
         );
         Then("the event should be handled", () => AssertEventHandlerCalled(true, false, false, true));
         When("the event is raised asynchronously", async () =>
             await EventHandlerBase.GetBy("Element4")
-                .Resolve<TestControllers.IDependency1>(() => Dependency1)
-                .Resolve<TestControllers.IDependency2>(() => Dependency2)
-                .Resolve<TestControllers.IDependency3>(() => Dependency3)
+                .Resolve<FromDIAttribute, TestControllers.IDependency1>(() => Dependency1)
+                .Resolve<FromDIAttribute, TestControllers.IDependency2>(() => Dependency2)
+                .Resolve<FromDIAttribute, TestControllers.IDependency3>(() => Dependency3)
                 .RaiseAsync("Click")
         );
         Then("the event should be handled", () => AssertEventHandlerCalled(true, false, false, true));
@@ -351,18 +366,18 @@ class EventHandlerExtensionSpec : FixtureSteppable
         When("the event is raised with an event data", () =>
             EventHandlerBase.GetBy("Element2")
                 .With(Args)
-                .Resolve<TestControllers.IDependency1>(() => Dependency1)
-                .Resolve<TestControllers.IDependency2>(() => Dependency2)
-                .Resolve<TestControllers.IDependency3>(() => Dependency3)
+                .Resolve<FromDIAttribute, TestControllers.IDependency1>(() => Dependency1)
+                .Resolve<FromDIAttribute, TestControllers.IDependency2>(() => Dependency2)
+                .Resolve<FromDIAttribute, TestControllers.IDependency3>(() => Dependency3)
                 .Raise("Click")
         );
         Then("the event should be handled", () => AssertEventHandlerCalled(false, true, false, true));
         When("the event is raised with an event data asynchronously", async () =>
             await EventHandlerBase.GetBy("Element5")
                 .With(Args)
-                .Resolve<TestControllers.IDependency1>(() => Dependency1)
-                .Resolve<TestControllers.IDependency2>(() => Dependency2)
-                .Resolve<TestControllers.IDependency3>(() => Dependency3)
+                .Resolve<FromDIAttribute, TestControllers.IDependency1>(() => Dependency1)
+                .Resolve<FromDIAttribute, TestControllers.IDependency2>(() => Dependency2)
+                .Resolve<FromDIAttribute, TestControllers.IDependency3>(() => Dependency3)
                 .RaiseAsync("Click")
         );
         Then("the event should be handled", () => AssertEventHandlerCalled(false, true, false, true));
@@ -372,9 +387,9 @@ class EventHandlerExtensionSpec : FixtureSteppable
             EventHandlerBase.GetBy("Element3")
                 .From(Sender)
                 .With(Args)
-                .Resolve<TestControllers.IDependency1>(() => Dependency1)
-                .Resolve<TestControllers.IDependency2>(() => Dependency2)
-                .Resolve<TestControllers.IDependency3>(() => Dependency3)
+                .Resolve<FromDIAttribute, TestControllers.IDependency1>(() => Dependency1)
+                .Resolve<FromDIAttribute, TestControllers.IDependency2>(() => Dependency2)
+                .Resolve<FromDIAttribute, TestControllers.IDependency3>(() => Dependency3)
                 .Raise("Click")
         );
         Then("the event should be handled", () => AssertEventHandlerCalled(false, false, true, true));
@@ -382,9 +397,9 @@ class EventHandlerExtensionSpec : FixtureSteppable
             await EventHandlerBase.GetBy("Element6")
                 .From(Sender)
                 .With(Args)
-                .Resolve<TestControllers.IDependency1>(() => Dependency1)
-                .Resolve<TestControllers.IDependency2>(() => Dependency2)
-                .Resolve<TestControllers.IDependency3>(() => Dependency3)
+                .Resolve<FromDIAttribute, TestControllers.IDependency1>(() => Dependency1)
+                .Resolve<FromDIAttribute, TestControllers.IDependency2>(() => Dependency2)
+                .Resolve<FromDIAttribute, TestControllers.IDependency3>(() => Dependency3)
                 .RaiseAsync("Click")
         );
         Then("the event should be handled", () => AssertEventHandlerCalled(false, false, true, true));
@@ -397,17 +412,17 @@ class EventHandlerExtensionSpec : FixtureSteppable
 
         When("the event is raised", () =>
             EventHandlerBase.GetBy("Element1")
-                .Resolve<TestControllers.IDependency1>(() => Dependency1)
-                .Resolve<TestControllers.IDependency2>(() => Dependency2)
-                .Resolve<TestControllers.IDependency3>(() => Dependency3)
+                .Resolve<FromDIAttribute, TestControllers.IDependency1>(() => Dependency1)
+                .Resolve<FromDIAttribute, TestControllers.IDependency2>(() => Dependency2)
+                .Resolve<FromDIAttribute, TestControllers.IDependency3>(() => Dependency3)
                 .Raise("Click")
         );
         Then("the event should not be handled", () => AssertEventHandlerCalled(false, false, false, false));
         When("the event is raised asynchronously", async () =>
             await EventHandlerBase.GetBy("Element4")
-                .Resolve<TestControllers.IDependency1>(() => Dependency1)
-                .Resolve<TestControllers.IDependency2>(() => Dependency2)
-                .Resolve<TestControllers.IDependency3>(() => Dependency3)
+                .Resolve<FromDIAttribute, TestControllers.IDependency1>(() => Dependency1)
+                .Resolve<FromDIAttribute, TestControllers.IDependency2>(() => Dependency2)
+                .Resolve<FromDIAttribute, TestControllers.IDependency3>(() => Dependency3)
                 .RaiseAsync("Click")
         );
         Then("the event should not be handled", () => AssertEventHandlerCalled(false, false, false, false));
@@ -416,18 +431,18 @@ class EventHandlerExtensionSpec : FixtureSteppable
         When("the event is raised with an event data", () =>
             EventHandlerBase.GetBy("Element2")
                 .With(Args)
-                .Resolve<TestControllers.IDependency1>(() => Dependency1)
-                .Resolve<TestControllers.IDependency2>(() => Dependency2)
-                .Resolve<TestControllers.IDependency3>(() => Dependency3)
+                .Resolve<FromDIAttribute, TestControllers.IDependency1>(() => Dependency1)
+                .Resolve<FromDIAttribute, TestControllers.IDependency2>(() => Dependency2)
+                .Resolve<FromDIAttribute, TestControllers.IDependency3>(() => Dependency3)
                 .Raise("Click")
         );
         Then("the event should not be handled", () => AssertEventHandlerCalled(false, false, false, false));
         When("the event is raised with an event data asynchronously", async () =>
             await EventHandlerBase.GetBy("Element5")
                 .With(Args)
-                .Resolve<TestControllers.IDependency1>(() => Dependency1)
-                .Resolve<TestControllers.IDependency2>(() => Dependency2)
-                .Resolve<TestControllers.IDependency3>(() => Dependency3)
+                .Resolve<FromDIAttribute, TestControllers.IDependency1>(() => Dependency1)
+                .Resolve<FromDIAttribute, TestControllers.IDependency2>(() => Dependency2)
+                .Resolve<FromDIAttribute, TestControllers.IDependency3>(() => Dependency3)
                 .RaiseAsync("Click")
         );
         Then("the event should not be handled", () => AssertEventHandlerCalled(false, false, false, false));
@@ -437,9 +452,9 @@ class EventHandlerExtensionSpec : FixtureSteppable
             EventHandlerBase.GetBy("Element3")
                 .From(Sender)
                 .With(Args)
-                .Resolve<TestControllers.IDependency1>(() => Dependency1)
-                .Resolve<TestControllers.IDependency2>(() => Dependency2)
-                .Resolve<TestControllers.IDependency3>(() => Dependency3)
+                .Resolve<FromDIAttribute, TestControllers.IDependency1>(() => Dependency1)
+                .Resolve<FromDIAttribute, TestControllers.IDependency2>(() => Dependency2)
+                .Resolve<FromDIAttribute, TestControllers.IDependency3>(() => Dependency3)
                 .Raise("Click")
         );
         Then("the event should not be handled", () => AssertEventHandlerCalled(false, false, false, false));
@@ -447,11 +462,67 @@ class EventHandlerExtensionSpec : FixtureSteppable
             await EventHandlerBase.GetBy("Element6")
                 .From(Sender)
                 .With(Args)
-                .Resolve<TestControllers.IDependency1>(() => Dependency1)
-                .Resolve<TestControllers.IDependency2>(() => Dependency2)
-                .Resolve<TestControllers.IDependency3>(() => Dependency3)
+                .Resolve<FromDIAttribute, TestControllers.IDependency1>(() => Dependency1)
+                .Resolve<FromDIAttribute, TestControllers.IDependency2>(() => Dependency2)
+                .Resolve<FromDIAttribute, TestControllers.IDependency3>(() => Dependency3)
                 .RaiseAsync("Click")
         );
         Then("the event should not be handled", () => AssertEventHandlerCalled(false, false, false, false));
+    }
+
+    [Example("When a type of a resolver to resolve parameters of an event handler is added/removed")]
+    void Ex14()
+    {
+        When("a resolver is added", () => ((EventHandlerExtensionTss)EventHandlerExtension).Add<TestEventHandlerParameterResolver1>());
+        Then("the specified type of a resolver should be added", () =>
+            ((EventHandlerExtensionTss)EventHandlerExtension).AssertParameterResolverTypes(typeof(TestEventHandlerParameterResolver1))
+        );
+
+        When("other resolvers are added", () =>
+        {
+            ((EventHandlerExtensionTss)EventHandlerExtension).Add<TestEventHandlerParameterResolver2>();
+            ((EventHandlerExtensionTss)EventHandlerExtension).Add(typeof(TestEventHandlerParameterResolver3));
+        });
+        Then("the specified resolvers should be added", () =>
+            ((EventHandlerExtensionTss)EventHandlerExtension).AssertParameterResolverTypes(
+                typeof(TestEventHandlerParameterResolver1), typeof(TestEventHandlerParameterResolver2), typeof(TestEventHandlerParameterResolver3)
+            )
+        );
+
+        When("a resolver that does not implement the IEventHandlerParameterResolver interface is added", () =>
+            ((EventHandlerExtensionTss)EventHandlerExtension).Add(typeof(object))
+        );
+        Then<ArgumentException>($"{typeof(ArgumentException)} should be thrown");
+
+        When("a resolver that is not a class is added", () =>
+            ((EventHandlerExtensionTss)EventHandlerExtension).Add(typeof(ITestEventHandlerParameterResolver))
+        );
+        Then<ArgumentException>($"{typeof(ArgumentException)} should be thrown");
+
+        When("a resolver that is an abstract class is added", () =>
+            ((EventHandlerExtensionTss)EventHandlerExtension).Add(typeof(EventHandlerParameterFromElementResolver))
+        );
+        Then<ArgumentException>($"{typeof(ArgumentException)} should be thrown");
+
+        When("a resolver that has already been added is added", () => ((EventHandlerExtensionTss)EventHandlerExtension).Add<TestEventHandlerParameterResolver1>());
+        Then("the specified resolver should not be added", () =>
+            ((EventHandlerExtensionTss)EventHandlerExtension).AssertParameterResolverTypes(
+                typeof(TestEventHandlerParameterResolver1), typeof(TestEventHandlerParameterResolver2), typeof(TestEventHandlerParameterResolver3)
+            )
+        );
+
+        When("a resolver is removed", () => ((EventHandlerExtensionTss)EventHandlerExtension).Remove<TestEventHandlerParameterResolver1>());
+        Then("the specified type of a resolver should be removed", () =>
+            ((EventHandlerExtensionTss)EventHandlerExtension).AssertParameterResolverTypes(
+                typeof(TestEventHandlerParameterResolver2), typeof(TestEventHandlerParameterResolver3)
+            )
+        );
+
+        When("other resolvers are removed", () =>
+        {
+            ((EventHandlerExtensionTss)EventHandlerExtension).Remove<TestEventHandlerParameterResolver2>();
+            ((EventHandlerExtensionTss)EventHandlerExtension).Remove(typeof(TestEventHandlerParameterResolver3));
+        });
+        Then("the specified resolvers should be removed", () => ((EventHandlerExtensionTss)EventHandlerExtension).AssertParameterResolverTypes());
     }
 }

@@ -66,7 +66,7 @@ public class EventHandlerBase<TElement, TItem> where TElement : class where TIte
         private object? sender;
         private object? e;
 
-        private readonly IDictionary<Type, Func<object?>> dependencyResolver = new Dictionary<Type, Func<object?>>();
+        private readonly IDictionary<Type, IDictionary<Type, Func<object?>>> parameterResolver = new Dictionary<Type, IDictionary<Type, Func<object?>>>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Executor"/> class
@@ -101,14 +101,31 @@ public class EventHandlerBase<TElement, TItem> where TElement : class where TIte
         }
 
         /// <summary>
-        /// Resolve a parameter of the specified type using the specified resolver.
+        /// Resolves a parameter of the specified type using the specified resolver.
         /// </summary>
         /// <typeparam name="T">The type of the parameter to inject to.</typeparam>
         /// <param name="resolver">The function to resolve the parameter of the specified type.</param>
         /// <returns>The instance of the <see cref="Executor"/></returns>
+        [Obsolete("This method is obsolete. Use the Resolve<TAttribute, TParameter>(Func<object?>) method instead.")]
         public Executor Resolve<T>(Func<object?> resolver)
         {
-            dependencyResolver[typeof(T)] = resolver;
+            return Resolve<FromDIAttribute, T>(resolver);
+        }
+
+        /// <summary>
+        /// Resolves a parameter of the specified attribute type and parameter type using the specified resolver.
+        /// </summary>
+        /// <typeparam name="TAttribute">The type of the attribute that specifies the parameter.</typeparam>
+        /// <typeparam name="TParameter">The type of the parameter that is resolved by the specified resolver.</typeparam>
+        /// <param name="resolver">The function to resolve the parameter of the specified type.</param>
+        /// <returns>The instance of the <see cref="Executor"/>.</returns>
+        public Executor Resolve<TAttribute, TParameter>(Func<object?> resolver) where TAttribute : Attribute
+        {
+            if (!parameterResolver.ContainsKey(typeof(TAttribute)))
+            {
+                parameterResolver[typeof(TAttribute)] = new Dictionary<Type, Func<object?>>();
+            }
+            parameterResolver[typeof(TAttribute)][typeof(TParameter)] = resolver;
             return this;
         }
 
@@ -116,7 +133,7 @@ public class EventHandlerBase<TElement, TItem> where TElement : class where TIte
         /// Raises the event of the specified name.
         /// </summary>
         /// <param name="eventName">The name of the event to raise.</param>
-        public void Raise(string eventName) => items.ForEach(item => item.Raise(eventName, sender, e, dependencyResolver));
+        public void Raise(string eventName) => items.ForEach(item => item.Raise(eventName, sender, e, parameterResolver));
 
         /// <summary>
         /// Raises the event of the specified name asynchronously.
@@ -127,7 +144,7 @@ public class EventHandlerBase<TElement, TItem> where TElement : class where TIte
         {
             foreach (var item in items)
             {
-                await item.RaiseAsync(eventName, sender, e, dependencyResolver);
+                await item.RaiseAsync(eventName, sender, e, parameterResolver);
             }
         }
     }

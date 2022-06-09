@@ -637,7 +637,7 @@ internal static class TestControllers
         }
     }
 
-    public class EventHandlerOfMethodWithDependencyParametersController
+    public class EventHandlerOfMethodWithParametersSpecifiedByAttributeController
     {
         [EventHandler(ElementName = "Element1", Event = "Click")]
         public void OnElement1Click([FromDI] IDependency1 dependency1, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3)
@@ -683,7 +683,7 @@ internal static class TestControllers
 
         private readonly Action<IDependency1, IDependency2, IDependency3> dependencyArgumentsHandler;
 
-        public EventHandlerOfMethodWithDependencyParametersController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler, Action<IDependency1, IDependency2, IDependency3> dependencyArgumentsAssertionHandler)
+        public EventHandlerOfMethodWithParametersSpecifiedByAttributeController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler, Action<IDependency1, IDependency2, IDependency3> dependencyArgumentsAssertionHandler)
         {
             noArgumentHandler = noArgumentAssertionHandler;
             oneArgumentHandler = oneArgumentAssertionHandler;

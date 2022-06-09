@@ -12,23 +12,60 @@ namespace Charites.Windows.Mvc;
 /// </summary>
 public class ParameterDependencyResolver : IParameterDependencyResolver
 {
-    private readonly IDictionary<Type, Func<object?>>? dependencyResolver;
+    private readonly IEnumerable<IEventHandlerParameterResolver> parameterResolver;
+    private readonly IDictionary<Type, IDictionary<Type, Func<object?>>> preferredParameterResolver;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ParameterDependencyResolver"/> class.
     /// </summary>
     public ParameterDependencyResolver()
     {
+        parameterResolver = Enumerable.Empty<IEventHandlerParameterResolver>();
+        preferredParameterResolver = new Dictionary<Type, IDictionary<Type, Func<object?>>>();
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ParameterDependencyResolver"/> class
-    /// with the specified resolver to resolver dependencies of parameters.
+    /// with the specified parameter resolver.
     /// </summary>
-    /// <param name="dependencyResolver">The resolver to resolve dependencies of parameters.</param>
-    public ParameterDependencyResolver(IDictionary<Type, Func<object?>> dependencyResolver)
+    /// <param name="parameterResolver">The resolver to resolve parameters.</param>
+    public ParameterDependencyResolver(IEnumerable<IEventHandlerParameterResolver> parameterResolver) : this(parameterResolver, new Dictionary<Type, IDictionary<Type, Func<object?>>>())
     {
-        this.dependencyResolver = dependencyResolver;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ParameterDependencyResolver"/> class
+    /// with the specified parameter resolvers.
+    /// </summary>
+    /// <param name="parameterResolver">The resolver to resolve parameters.</param>
+    /// <param name="preferredParameterResolver">The preferred resolver to resolve parameters.</param>
+    public ParameterDependencyResolver(IEnumerable<IEventHandlerParameterResolver> parameterResolver, IDictionary<Type, IDictionary<Type, Func<object?>>> preferredParameterResolver)
+    {
+        this.parameterResolver = parameterResolver;
+        this.preferredParameterResolver = preferredParameterResolver;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ParameterDependencyResolver"/> class
+    /// with the specified resolver to resolver parameters from the dependency injection.
+    /// </summary>
+    /// <param name="dependencyInjectionResolver">The resolver to resolve parameters from the dependency injection.</param>
+    [Obsolete("This constructor is obsolete. Use the .ctor(IEnumerable<IEventHandlerParameterResolver>, IDictionary<Type, IDictionary<Type, Func<object?>>>) instead.")]
+    public ParameterDependencyResolver(IDictionary<Type, Func<object?>> dependencyInjectionResolver) : this(Enumerable.Empty<IEventHandlerParameterResolver>(), dependencyInjectionResolver)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ParameterDependencyResolver"/> class
+    /// with the specified resolvers to resolver parameters.
+    /// </summary>
+    /// <param name="parameterResolver">The resolver to resolve parameters.</param>
+    /// <param name="dependencyInjectionResolver">The resolver to resolve parameters from the dependency injection.</param>
+    [Obsolete("This constructor is obsolete. Use the .ctor(IEnumerable<IEventHandlerParameterResolver>, IDictionary<Type, IDictionary<Type, Func<object?>>>) instead.")]
+    public ParameterDependencyResolver(IEnumerable<IEventHandlerParameterResolver> parameterResolver, IDictionary<Type, Func<object?>> dependencyInjectionResolver)
+    {
+        this.parameterResolver = parameterResolver;
+        preferredParameterResolver = new Dictionary<Type, IDictionary<Type, Func<object?>>> { [typeof(FromDIAttribute)] = dependencyInjectionResolver };
     }
 
     /// <summary>
@@ -41,9 +78,9 @@ public class ParameterDependencyResolver : IParameterDependencyResolver
     protected virtual object?[] Resolve(MethodInfo method, object? sender, object? e)
     {
         var parameters = method.GetParameters();
-        var parameterCountExceptDependencyInjection = parameters.Count(p => p.GetCustomAttribute<FromDIAttribute>() is null);
+        var parameterCountExceptDependencyInjection = parameters.Count(p => p.GetCustomAttribute<Attribute>() is null);
         if (parameterCountExceptDependencyInjection > 2)
-            throw new InvalidOperationException("The length of the method parameters except ones attributed by FromDIAttribute attribute must be less than 3.");
+            throw new InvalidOperationException("The length of the method parameters except ones specified by an attribute must be less than 3.");
 
         var specificParameterQueue = new Queue();
         switch (parameterCountExceptDependencyInjection)
@@ -68,7 +105,7 @@ public class ParameterDependencyResolver : IParameterDependencyResolver
     /// <returns>A parameter of the invoked method.</returns>
     protected virtual object? ResolveParameter(ParameterInfo parameter, Queue specificParameterQueue)
     {
-        return parameter.GetCustomAttribute<FromDIAttribute>() is null ? specificParameterQueue.Dequeue() : ResolveParameterFromDependency(parameter);
+        return parameter.GetCustomAttribute<Attribute>() is null ? specificParameterQueue.Dequeue() : ResolveParameterFromDependency(parameter);
     }
 
     /// <summary>
@@ -78,7 +115,13 @@ public class ParameterDependencyResolver : IParameterDependencyResolver
     /// <returns>A parameter of the invoked method.</returns>
     protected virtual object? ResolveParameterFromDependency(ParameterInfo parameter)
     {
-        return dependencyResolver?.ContainsKey(parameter.ParameterType) ?? false ? dependencyResolver[parameter.ParameterType]() : null;
+        return preferredParameterResolver
+                .Where(resolver => parameter.GetCustomAttribute(resolver.Key) is not null)
+                .Select(resolver => resolver.Value.ContainsKey(parameter.ParameterType) ? resolver.Value[parameter.ParameterType]() : null)
+                .FirstOrDefault(parameterValue => parameterValue is not null) ??
+            parameterResolver
+                .Select(resolver => resolver.Resolve(parameter))
+                .FirstOrDefault(parameterValue => parameterValue is not null);
     }
 
     object?[] IParameterDependencyResolver.Resolve(MethodInfo method, object? sender, object? e) => Resolve(method, sender, e);

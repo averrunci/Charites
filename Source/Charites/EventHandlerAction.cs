@@ -13,6 +13,7 @@ public class EventHandlerAction
 {
     private readonly MethodInfo method;
     private readonly object? target;
+    private readonly IParameterDependencyResolver parameterDependencyResolver;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EventHandlerAction"/> class
@@ -20,10 +21,23 @@ public class EventHandlerAction
     /// </summary>
     /// <param name="method">The method to handle an event.</param>
     /// <param name="target">The target object to invoke the method to handle an event.</param>
-    public EventHandlerAction(MethodInfo method, object? target)
+    public EventHandlerAction(MethodInfo method, object? target) : this(method, target, new ParameterDependencyResolver())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EventHandlerAction"/> class
+    /// with the specified method to handle an event, target to invoke it, and
+    /// resolver to resolve parameters of the invoked method.
+    /// </summary>
+    /// <param name="method">The method to handle an event.</param>
+    /// <param name="target">The target object to invoke the method to handle an event.</param>
+    /// <param name="parameterDependencyResolver">The resolver to resolve parameters of the invoked method.</param>
+    public EventHandlerAction(MethodInfo method, object? target, IParameterDependencyResolver parameterDependencyResolver)
     {
         this.method = method;
         this.target = target;
+        this.parameterDependencyResolver = parameterDependencyResolver;
     }
 
     /// <summary>
@@ -41,7 +55,7 @@ public class EventHandlerAction
     /// <returns>An object containing the return value of the invoked method.</returns>
     public object? Handle(object? sender, object? e)
     {
-        return Handle(sender, e, null);
+        return Handle(sender, e, parameterDependencyResolver);
     }
 
     /// <summary>
@@ -52,9 +66,23 @@ public class EventHandlerAction
     /// <param name="e">The event data.</param>
     /// <param name="dependencyResolver">The resolver to resolve dependencies of parameters.</param>
     /// <returns>An object containing the return value of the invoked method.</returns>
+    [Obsolete("This method is obsolete. Use the Handle(object?, object? IParameterDependencyResolver) method instead.")]
     public object? Handle(object? sender, object? e, IDictionary<Type, Func<object?>>? dependencyResolver)
     {
         return Handle(CreateParameterDependencyResolver(dependencyResolver).Resolve(method, sender, e));
+    }
+
+    /// <summary>
+    /// Handles the event with the specified source of the event, event data, and
+    /// resolver to resolve dependencies of parameters.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The event data.</param>
+    /// <param name="parameterDependency">The resolver to resolve dependencies of parameters.</param>
+    /// <returns>An object containing the return value of the invoked method.</returns>
+    public object? Handle(object? sender, object? e, IParameterDependencyResolver parameterDependency)
+    {
+        return Handle(parameterDependency.Resolve(method, sender, e));
     }
 
     /// <summary>
@@ -83,6 +111,7 @@ public class EventHandlerAction
     /// </summary>
     /// <param name="dependencyResolver">The resolver to resolve dependencies of parameter.</param>
     /// <returns>The resolver to resolve dependencies of parameters.</returns>
+    [Obsolete("This method is obsolete. The IParameterDependencyResolver is specified by a constructor.")]
     protected virtual IParameterDependencyResolver CreateParameterDependencyResolver(IDictionary<Type, Func<object?>>? dependencyResolver)
     {
         return dependencyResolver is null ? new ParameterDependencyResolver() : new ParameterDependencyResolver(dependencyResolver);

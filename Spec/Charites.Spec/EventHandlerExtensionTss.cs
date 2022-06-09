@@ -10,6 +10,9 @@ internal sealed class EventHandlerExtensionTss : EventHandlerExtension<TestEleme
 {
     private IDictionary<object, EventHandlerBase<TestElement, EventHandlerItemTss>>? eventHandlerBases;
 
+    public bool AssertParameterResolverTypes(params Type[] parameterResolverTypes)
+        => ParameterResolverTypes.SequenceEqual(parameterResolverTypes);
+
     protected override IDictionary<object, EventHandlerBase<TestElement, EventHandlerItemTss>> EnsureEventHandlerBases(TestElement? element)
         => eventHandlerBases ??= new ConcurrentDictionary<object, EventHandlerBase<TestElement, EventHandlerItemTss>>();
 
@@ -17,7 +20,8 @@ internal sealed class EventHandlerExtensionTss : EventHandlerExtension<TestEleme
     {
         eventHandlers.Add(new EventHandlerItemTss(
             eventHandlerAttribute.ElementName, element,
-            eventHandlerAttribute.Event,  handlerCreator(null), eventHandlerAttribute.HandledEventsToo
+            eventHandlerAttribute.Event,  handlerCreator(null), eventHandlerAttribute.HandledEventsToo,
+            CreateParameterResolver()
         ));
     }
 }

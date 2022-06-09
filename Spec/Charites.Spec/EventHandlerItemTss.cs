@@ -22,6 +22,12 @@ internal sealed class EventHandlerItemTss : EventHandlerItem<TestElement>
         this.handler = handler;
         this.handledEventsToo = handledEventsToo;
     }
+    public EventHandlerItemTss(string elementName, TestElement? element, string eventName, Delegate? handler, bool handledEventsToo, IEnumerable<IEventHandlerParameterResolver> parameterResolver) : base(elementName, element, eventName, handler, handledEventsToo, parameterResolver)
+    {
+        this.element = element;
+        this.handler = handler;
+        this.handledEventsToo = handledEventsToo;
+    }
 
     public void ClearCalled()
     {
