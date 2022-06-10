@@ -50,7 +50,7 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
     /// Removes the specified type of a resolver to resolve of parameters of an event handler.
     /// </summary>
     /// <param name="resolverType">The type of a resolver to resolve of parameters of an event handler.</param>
-    public virtual void Remove(Type resolverType) => RemoveParameterResolverType(resolverType);
+    public void Remove(Type resolverType) => RemoveParameterResolverType(resolverType);
 
     /// <summary>
     /// Ensures <see cref="EventHandlerBase{TElement,TItem}"/> associated with the specified element.
