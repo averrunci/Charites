@@ -13,7 +13,7 @@ namespace Charites.Windows.Mvc;
 public class ParameterDependencyResolver : IParameterDependencyResolver
 {
     private readonly IEnumerable<IEventHandlerParameterResolver> parameterResolver;
-    private readonly IDictionary<Type, IDictionary<Type, Func<object?>>> preferredParameterResolver;
+    private readonly IEventHandlerParameterResolver? preferredParameterResolver;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ParameterDependencyResolver"/> class.
@@ -21,7 +21,6 @@ public class ParameterDependencyResolver : IParameterDependencyResolver
     public ParameterDependencyResolver()
     {
         parameterResolver = Enumerable.Empty<IEventHandlerParameterResolver>();
-        preferredParameterResolver = new Dictionary<Type, IDictionary<Type, Func<object?>>>();
     }
 
     /// <summary>
@@ -29,8 +28,9 @@ public class ParameterDependencyResolver : IParameterDependencyResolver
     /// with the specified parameter resolver.
     /// </summary>
     /// <param name="parameterResolver">The resolver to resolve parameters.</param>
-    public ParameterDependencyResolver(IEnumerable<IEventHandlerParameterResolver> parameterResolver) : this(parameterResolver, new Dictionary<Type, IDictionary<Type, Func<object?>>>())
+    public ParameterDependencyResolver(IEnumerable<IEventHandlerParameterResolver> parameterResolver)
     {
+        this.parameterResolver = parameterResolver;
     }
 
     /// <summary>
@@ -39,7 +39,7 @@ public class ParameterDependencyResolver : IParameterDependencyResolver
     /// </summary>
     /// <param name="parameterResolver">The resolver to resolve parameters.</param>
     /// <param name="preferredParameterResolver">The preferred resolver to resolve parameters.</param>
-    public ParameterDependencyResolver(IEnumerable<IEventHandlerParameterResolver> parameterResolver, IDictionary<Type, IDictionary<Type, Func<object?>>> preferredParameterResolver)
+    public ParameterDependencyResolver(IEnumerable<IEventHandlerParameterResolver> parameterResolver, IEventHandlerParameterResolver preferredParameterResolver)
     {
         this.parameterResolver = parameterResolver;
         this.preferredParameterResolver = preferredParameterResolver;
@@ -47,25 +47,30 @@ public class ParameterDependencyResolver : IParameterDependencyResolver
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ParameterDependencyResolver"/> class
-    /// with the specified resolver to resolver parameters from the dependency injection.
+    /// with the specified resolver to resolve parameters from the dependency injection.
     /// </summary>
     /// <param name="dependencyInjectionResolver">The resolver to resolve parameters from the dependency injection.</param>
-    [Obsolete("This constructor is obsolete. Use the .ctor(IEnumerable<IEventHandlerParameterResolver>, IDictionary<Type, IDictionary<Type, Func<object?>>>) instead.")]
+    [Obsolete("This constructor is obsolete. Use the .ctor(IEnumerable<IEventHandlerParameterResolver>, IEventHandlerParameterResolver) instead.")]
     public ParameterDependencyResolver(IDictionary<Type, Func<object?>> dependencyInjectionResolver) : this(Enumerable.Empty<IEventHandlerParameterResolver>(), dependencyInjectionResolver)
     {
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ParameterDependencyResolver"/> class
-    /// with the specified resolvers to resolver parameters.
+    /// with the specified resolvers to resolve parameters.
     /// </summary>
     /// <param name="parameterResolver">The resolver to resolve parameters.</param>
     /// <param name="dependencyInjectionResolver">The resolver to resolve parameters from the dependency injection.</param>
-    [Obsolete("This constructor is obsolete. Use the .ctor(IEnumerable<IEventHandlerParameterResolver>, IDictionary<Type, IDictionary<Type, Func<object?>>>) instead.")]
+    [Obsolete("This constructor is obsolete. Use the .ctor(IEnumerable<IEventHandlerParameterResolver>, IEventHandlerParameterResolver) instead.")]
     public ParameterDependencyResolver(IEnumerable<IEventHandlerParameterResolver> parameterResolver, IDictionary<Type, Func<object?>> dependencyInjectionResolver)
     {
         this.parameterResolver = parameterResolver;
-        preferredParameterResolver = new Dictionary<Type, IDictionary<Type, Func<object?>>> { [typeof(FromDIAttribute)] = dependencyInjectionResolver };
+        preferredParameterResolver = new EventHandlerParameterResolverBase(
+            new Tuple<Type, IEnumerable<IEventHandlerParameterResolver>>(
+                typeof(FromDIAttribute),
+                dependencyInjectionResolver.Select(x => new DefaultEventHandlerParameterFromDIResolver(x.Key, x.Value))
+            )
+        );
     }
 
     /// <summary>
@@ -114,15 +119,7 @@ public class ParameterDependencyResolver : IParameterDependencyResolver
     /// <param name="parameter">The <see cref="ParameterInfo"/> from which a parameter is resolved.</param>
     /// <returns>A parameter of the invoked method.</returns>
     protected virtual object? ResolveParameterFromDependency(ParameterInfo parameter)
-    {
-        return preferredParameterResolver
-                .Where(resolver => parameter.GetCustomAttribute(resolver.Key) is not null)
-                .Select(resolver => resolver.Value.ContainsKey(parameter.ParameterType) ? resolver.Value[parameter.ParameterType]() : null)
-                .FirstOrDefault(parameterValue => parameterValue is not null) ??
-            parameterResolver
-                .Select(resolver => resolver.Resolve(parameter))
-                .FirstOrDefault(parameterValue => parameterValue is not null);
-    }
+        => preferredParameterResolver?.Resolve(parameter) ?? parameterResolver.Select(resolver => resolver.Resolve(parameter)).FirstOrDefault(parameterValue => parameterValue is not null);
 
     object?[] IParameterDependencyResolver.Resolve(MethodInfo method, object? sender, object? e) => Resolve(method, sender, e);
 }

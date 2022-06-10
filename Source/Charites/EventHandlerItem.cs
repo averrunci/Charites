@@ -123,7 +123,7 @@ public abstract class EventHandlerItem<TElement> where TElement : class
     /// <param name="sender">the object where the event handler is attached.</param>
     /// <param name="e">The event data./</param>
     /// <param name="dependencyResolver">The resolver to resolve dependencies of parameters.</param>
-    [Obsolete("This method is obsolete. Use the Raise(string, object?, object?, IDictionary<Type, IDictionary<Type, Func<object?>>>) method instead.")]
+    [Obsolete("This method is obsolete. Use the Raise(string, object?, object?, IEventHandlerParameterResolver) method instead.")]
     public void Raise(string eventName, object? sender, object? e, IDictionary<Type, Func<object?>> dependencyResolver)
     {
         if (this.eventName != eventName || handler is null) return;
@@ -138,7 +138,7 @@ public abstract class EventHandlerItem<TElement> where TElement : class
     /// <param name="sender">The object where the event handler is attached.</param>
     /// <param name="e">The event data.</param>
     /// <param name="preferredParameterResolver">The resolver to resolve parameters.</param>
-    public void Raise(string eventName, object? sender, object? e, IDictionary<Type, IDictionary<Type, Func<object?>>> preferredParameterResolver)
+    public void Raise(string eventName, object? sender, object? e, IEventHandlerParameterResolver preferredParameterResolver)
     {
         if (this.eventName != eventName || handler is null) return;
 
@@ -170,7 +170,7 @@ public abstract class EventHandlerItem<TElement> where TElement : class
     /// <param name="e">The event data.</param>
     /// <param name="dependencyResolver">The resolver to resolve dependencies of parameters.</param>
     /// <returns>A task that represents the asynchronous raise operation.</returns>
-    [Obsolete("This method is obsolete. Use the RaiseAsync(string, object?, object?, IDictionary<Type, IDictionary<Type, Func<object?>>>) method instead.")]
+    [Obsolete("This method is obsolete. Use the RaiseAsync(string, object?, object?, IEventHandlerParameterResolver) method instead.")]
     public async Task RaiseAsync(string eventName, object? sender, object? e, IDictionary<Type, Func<object?>>? dependencyResolver)
     {
         if (this.eventName != eventName || handler is null) return;
@@ -189,7 +189,7 @@ public abstract class EventHandlerItem<TElement> where TElement : class
     /// <param name="e">The event data.</param>
     /// <param name="preferredParameterResolver">The resolver to resolve parameters.</param>
     /// <returns>A task that represents the asynchronous raise operation.</returns>
-    public async Task RaiseAsync(string eventName, object? sender, object? e, IDictionary<Type, IDictionary<Type, Func<object?>>> preferredParameterResolver)
+    public async Task RaiseAsync(string eventName, object? sender, object? e, IEventHandlerParameterResolver preferredParameterResolver)
     {
         if (this.eventName != eventName || handler is null) return;
 
@@ -204,7 +204,7 @@ public abstract class EventHandlerItem<TElement> where TElement : class
     /// </summary>
     /// <param name="dependencyResolver">The resolver to resolve dependencies of parameter.</param>
     /// <returns>The resolver to resolve dependencies of parameters.</returns>
-    [Obsolete("This method is obsolete. Use the CreateParameterDependencyResolver(IDictionary<Type, IDictionary<Type, Func<object?>>>) method instead.")]
+    [Obsolete("This method is obsolete. Use the CreateParameterDependencyResolver(IEventHandlerParameterResolver) method instead.")]
     protected virtual IParameterDependencyResolver CreateParameterDependencyResolver(IDictionary<Type, Func<object?>>? dependencyResolver)
     {
         return dependencyResolver is null ? new ParameterDependencyResolver(parameterResolver) : new ParameterDependencyResolver(parameterResolver, dependencyResolver);
@@ -215,7 +215,7 @@ public abstract class EventHandlerItem<TElement> where TElement : class
     /// </summary>
     /// <param name="preferredParameterResolver">The resolver to resolve parameters.</param>
     /// <returns>The resolver to resolve dependencies of parameters.</returns>
-    protected virtual IParameterDependencyResolver CreateParameterDependencyResolver(IDictionary<Type, IDictionary<Type, Func<object?>>>? preferredParameterResolver)
+    protected virtual IParameterDependencyResolver CreateParameterDependencyResolver(IEventHandlerParameterResolver? preferredParameterResolver)
     {
         return preferredParameterResolver is null ? new ParameterDependencyResolver(parameterResolver) : new ParameterDependencyResolver(parameterResolver, preferredParameterResolver);
     }
@@ -249,7 +249,7 @@ public abstract class EventHandlerItem<TElement> where TElement : class
     /// <param name="e">The event data.</param>
     /// <returns>An object containing the return value of the handler method.</returns>
     protected virtual object? Handle(Delegate handler, object? sender, object? e)
-        => Handle(handler, sender, e, (IDictionary<Type, IDictionary<Type, Func<object?>>>?)null);
+        => Handle(handler, sender, e, (IEventHandlerParameterResolver?)null);
 
     /// <summary>
     /// Handles the event with the specified object where the event handler is attached,
@@ -260,7 +260,7 @@ public abstract class EventHandlerItem<TElement> where TElement : class
     /// <param name="e">The event data.</param>
     /// <param name="dependencyResolver">The resolver to resolve dependencies of parameters.</param>
     /// <returns>An object containing the return value of the handler method.</returns>
-    [Obsolete("This method is obsolete. Use the Handle(Delegate, object?, object?, IDictionary<Type, IDictionary<Type, Func<object?>>>?) method instead.")]
+    [Obsolete("This method is obsolete. Use the Handle(Delegate, object?, object?, IEventHandlerParameterResolver?) method instead.")]
     protected virtual object? Handle(Delegate handler, object? sender, object? e, IDictionary<Type, Func<object?>>? dependencyResolver)
         => handler.Target is EventHandlerAction eventHandlerAction ?
             eventHandlerAction.Handle(sender, e, dependencyResolver) :
@@ -275,7 +275,7 @@ public abstract class EventHandlerItem<TElement> where TElement : class
     /// <param name="e">The event data.</param>
     /// <param name="preferredParameterResolver">The resolver to resolve parameters.</param>
     /// <returns>An object containing the return value of the handler method.</returns>
-    protected virtual object? Handle(Delegate handler, object? sender, object? e, IDictionary<Type, IDictionary<Type, Func<object?>>>? preferredParameterResolver)
+    protected virtual object? Handle(Delegate handler, object? sender, object? e, IEventHandlerParameterResolver? preferredParameterResolver)
     {
         var parameterDependencyResolver = CreateParameterDependencyResolver(preferredParameterResolver);
         return handler.Target is EventHandlerAction eventHandlerAction ?

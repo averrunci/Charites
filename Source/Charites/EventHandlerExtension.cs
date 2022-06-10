@@ -164,7 +164,7 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
         => controller.GetType()
             .GetFields(EventHandlerBindingFlags)
             .Where(field => field.GetCustomAttributes<EventHandlerAttribute>(true).Any())
-            .ForEach(field => AddEventHandlers(field, element, handlerType => CreateEventHandler(field.GetValue(controller) as Delegate, handlerType), eventHandlers));
+            .ForEach(field => AddEventHandlers(field, element, handlerType => CreateEventHandler(field.GetValue(controller) as Delegate, handlerType, element), eventHandlers));
 
     /// <summary>
     /// Retrieves event handlers from properties that are defined in the specified controller.
@@ -177,7 +177,7 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
             .GetProperties(EventHandlerBindingFlags)
             .Where(property => property.GetCustomAttributes<EventHandlerAttribute>(true).Any())
             .Where(property => property.CanRead)
-            .ForEach(property => AddEventHandlers(property, element, handlerType => CreateEventHandler(property.GetValue(controller) as Delegate, handlerType), eventHandlers));
+            .ForEach(property => AddEventHandlers(property, element, handlerType => CreateEventHandler(property.GetValue(controller) as Delegate, handlerType, element), eventHandlers));
 
     /// <summary>
     /// Retrieves event handlers from methods that are defined in the specified controller.
@@ -189,7 +189,7 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
         => controller.GetType()
             .GetMethods(EventHandlerBindingFlags)
             .Where(method => method.GetCustomAttributes<EventHandlerAttribute>(true).Any())
-            .ForEach(method => AddEventHandlers(method, element, handlerType => CreateEventHandler(method, controller, handlerType), eventHandlers));
+            .ForEach(method => AddEventHandlers(method, element, handlerType => CreateEventHandler(method, controller, handlerType, element), eventHandlers));
 
     /// <summary>
     /// Retrieves event handlers from methods that are defined in the specified controller.
@@ -214,7 +214,7 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
                     }
                 };
             })
-            .ForEach(x => AddEventHandler(element, x.EventHanndlerAttribute, handlerType => CreateEventHandler(x.MethodInfo, controller, handlerType), eventHandlers));
+            .ForEach(x => AddEventHandler(element, x.EventHanndlerAttribute, handlerType => CreateEventHandler(x.MethodInfo, controller, handlerType, element), eventHandlers));
 
     /// <summary>
     /// Filters the specified <see cref="MethodInfo"/> to match the naming convention.
@@ -253,8 +253,10 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
     /// </summary>
     /// <param name="delegate">The delegate of the method to handle the event.</param>
     /// <param name="handlerType">The type of the event handler.</param>
+    /// <param name="element">The element that raises the event.</param>
     /// <returns>The delegate to handle the event.</returns>
-    protected Delegate? CreateEventHandler(Delegate? @delegate, Type? handlerType) => @delegate is null ? null : CreateEventHandler(@delegate.Method, @delegate.Target, handlerType);
+    protected Delegate? CreateEventHandler(Delegate? @delegate, Type? handlerType, TElement? element = null)
+        => @delegate is null ? null : CreateEventHandler(@delegate.Method, @delegate.Target, handlerType, element);
 
     /// <summary>
     /// Creates an event handler with the specified method, target, and type of the handler.
@@ -262,10 +264,11 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
     /// <param name="method">The method to handle the event.</param>
     /// <param name="target">The target object to invoke the method to handle the event.</param>
     /// <param name="handlerType">The type of the event handler.</param>
+    /// <param name="element">The element that raises the event.</param>
     /// <returns>The delegate to handle the event.</returns>
-    protected virtual Delegate? CreateEventHandler(MethodInfo method, object? target, Type? handlerType)
+    protected virtual Delegate? CreateEventHandler(MethodInfo method, object? target, Type? handlerType, TElement? element = null)
     {
-        var action = CreateEventHandlerAction(method, target);
+        var action = CreateEventHandlerAction(method, target, element);
         return action.GetType()
             .GetMethod(nameof(EventHandlerAction.OnHandled))
             ?.CreateDelegate(handlerType ?? typeof(Handler), action);
@@ -276,18 +279,20 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
     /// </summary>
     /// <param name="method">The method to handle the event.</param>
     /// <param name="target">The target object to invoke the method to handle the event.</param>
+    /// <param name="element">The element that raises the event.</param>
     /// <returns>The action to handle the event.</returns>
-    protected virtual EventHandlerAction CreateEventHandlerAction(MethodInfo method, object? target)
-        => new(method, target, new ParameterDependencyResolver(CreateParameterResolver()));
+    protected virtual EventHandlerAction CreateEventHandlerAction(MethodInfo method, object? target, TElement? element = null)
+        => new(method, target, new ParameterDependencyResolver(CreateParameterResolver(element)));
 
     /// <summary>
     /// Creates a resolver to resolve parameters of an event handler.
     /// </summary>
+    /// <param name="element">The element that raises the event.</param>
     /// <returns>The resolver to resolve parameters of an event handler.</returns>
-    protected virtual IEnumerable<IEventHandlerParameterResolver> CreateParameterResolver()
+    protected virtual IEnumerable<IEventHandlerParameterResolver> CreateParameterResolver(TElement? element)
         => ParameterResolverTypes
             .Where(t => t.IsClass && !t.IsAbstract)
-            .Select(t => Activator.CreateInstance(t) as IEventHandlerParameterResolver)
+            .Select(t => Activator.CreateInstance(t, element) as IEventHandlerParameterResolver)
             .OfType<IEventHandlerParameterResolver>()
             .ToList();
 

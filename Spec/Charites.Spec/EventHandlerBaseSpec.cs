@@ -38,12 +38,12 @@ class EventHandlerBaseSpec : FixtureSteppable
     TestElement Element5 { get; } = new("Element5");
     TestElement Element6 { get; } = new("Element6");
 
-    string Event1 { get; } = "Event1Raised";
-    string Event2 { get; } = "Event2Raised";
-    string Event3 { get; } = "Event3Raised";
-    string Event4 { get; } = "Event4Raised";
-    string Event5 { get; } = "Event5Raised";
-    string Event6 { get; } = "Event6Raised";
+    string Event1 => "Event1Raised";
+    string Event2 => "Event2Raised";
+    string Event3 => "Event3Raised";
+    string Event4 => "Event4Raised";
+    string Event5 => "Event5Raised";
+    string Event6 => "Event6Raised";
 
     object Sender { get; } = new();
     object Args { get; } = new();
@@ -244,18 +244,18 @@ class EventHandlerBaseSpec : FixtureSteppable
 
         When("the event is raised for the specified element with parameters specified by the attribute", () =>
             EventHandlerBase.GetBy(Element1.Name)
-                .Resolve<FromDIAttribute, IDependency1>(() => Dependency1)
-                .Resolve<FromDIAttribute, IDependency2>(() => Dependency2)
-                .Resolve<FromDIAttribute, IDependency3>(() => Dependency3)
+                .ResolveFromDI<IDependency1>(() => Dependency1)
+                .ResolveFromDI<IDependency2>(() => Dependency2)
+                .ResolveFromDI<IDependency3>(() => Dependency3)
                 .Raise(Event4)
         );
         Then("the event should be handled with the parameters specified by the attribute", () => AssertAttributedParameterEventHandlerCalled(1, 0, 0));
         When("the event is raised for the specified element with parameters specified by the attribute and an event data", () =>
             EventHandlerBase.GetBy(Element2.Name)
                 .With(Args)
-                .Resolve<FromDIAttribute, IDependency1>(() => Dependency1)
-                .Resolve<FromDIAttribute, IDependency2>(() => Dependency2)
-                .Resolve<FromDIAttribute, IDependency3>(() => Dependency3)
+                .ResolveFromDI<IDependency1>(() => Dependency1)
+                .ResolveFromDI<IDependency2>(() => Dependency2)
+                .ResolveFromDI<IDependency3>(() => Dependency3)
                 .Raise(Event5)
         );
         Then("the event should be handled with the parameters specified by the attribute and event data", () => AssertAttributedParameterEventHandlerCalled(0, 1, 0));
@@ -263,9 +263,9 @@ class EventHandlerBaseSpec : FixtureSteppable
             EventHandlerBase.GetBy(Element3.Name)
                 .From(Sender)
                 .With(Args)
-                .Resolve<FromDIAttribute, IDependency1>(() => Dependency1)
-                .Resolve<FromDIAttribute, IDependency2>(() => Dependency2)
-                .Resolve<FromDIAttribute, IDependency3>(() => Dependency3)
+                .ResolveFromDI<IDependency1>(() => Dependency1)
+                .ResolveFromDI<IDependency2>(() => Dependency2)
+                .ResolveFromDI<IDependency3>(() => Dependency3)
                 .Raise(Event6)
         );
         Then("the event should be handled with the parameters specified by the attribute, sender object and event data", () => AssertAttributedParameterEventHandlerCalled(0, 0, 2));
@@ -283,18 +283,18 @@ class EventHandlerBaseSpec : FixtureSteppable
 
         When("the event is raised for the specified element with parameters specified by the attribute asynchronously", async () =>
             await EventHandlerBase.GetBy(Element4.Name)
-                .Resolve<FromDIAttribute, IDependency1>(() => Dependency1)
-                .Resolve<FromDIAttribute, IDependency2>(() => Dependency2)
-                .Resolve<FromDIAttribute, IDependency3>(() => Dependency3)
+                .ResolveFromDI<IDependency1>(() => Dependency1)
+                .ResolveFromDI<IDependency2>(() => Dependency2)
+                .ResolveFromDI<IDependency3>(() => Dependency3)
                 .RaiseAsync(Event4)
         );
         Then("the event should be handled with the parameters specified by the attribute", () => AssertAttributedParameterEventHandlerCalled(1, 0, 0));
         When("the event is raised for the specified element with parameters specified by the attribute and an event data asynchronously", async () =>
             await EventHandlerBase.GetBy(Element5.Name)
                 .With(Args)
-                .Resolve<FromDIAttribute, IDependency1>(() => Dependency1)
-                .Resolve<FromDIAttribute, IDependency2>(() => Dependency2)
-                .Resolve<FromDIAttribute, IDependency3>(() => Dependency3)
+                .ResolveFromDI<IDependency1>(() => Dependency1)
+                .ResolveFromDI<IDependency2>(() => Dependency2)
+                .ResolveFromDI<IDependency3>(() => Dependency3)
                 .RaiseAsync(Event5)
         );
         Then("the event should be handled with the parameters specified by the attribute and event data", () => AssertAttributedParameterEventHandlerCalled(0, 1, 0));
@@ -302,9 +302,9 @@ class EventHandlerBaseSpec : FixtureSteppable
             await EventHandlerBase.GetBy(Element6.Name)
                 .From(Sender)
                 .With(Args)
-                .Resolve<FromDIAttribute, IDependency1>(() => Dependency1)
-                .Resolve<FromDIAttribute, IDependency2>(() => Dependency2)
-                .Resolve<FromDIAttribute, IDependency3>(() => Dependency3)
+                .ResolveFromDI<IDependency1>(() => Dependency1)
+                .ResolveFromDI<IDependency2>(() => Dependency2)
+                .ResolveFromDI<IDependency3>(() => Dependency3)
                 .RaiseAsync(Event6)
         );
         Then("the event should be handled with the parameters specified by the attribute, sender object and event data", () => AssertAttributedParameterEventHandlerCalled(0, 0, 2));

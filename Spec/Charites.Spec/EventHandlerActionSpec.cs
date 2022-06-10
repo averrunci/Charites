@@ -26,18 +26,13 @@ class EventHandlerActionSpec : FixtureSteppable
     bool TwoArgumentsAttributedParametersMethodCalled { get; set; }
     bool Result { get; set; }
 
-    IParameterDependencyResolver ParameterResolver { get; } = new ParameterDependencyResolver(
-        Enumerable.Empty<IEventHandlerParameterResolver>(),
-        new Dictionary<Type, IDictionary<Type, Func<object?>>>
-        {
-            [typeof(FromDIAttribute)] = new Dictionary<Type, Func<object?>>
-            {
-                [typeof(IDependency1)] = () => new Dependency1Implementation(),
-                [typeof(IDependency2)] = () => new Dependency2Implementation(),
-                [typeof(IDependency3)] = () => new Dependency3Implementation()
-            }
-        }
-    );
+    IParameterDependencyResolver ParameterResolver { get; }
+    IDictionary<Type, Func<object?>> ParameterFromDIResolver { get; } = new Dictionary<Type, Func<object?>>
+    {
+        [typeof(IDependency1)] = () => new Dependency1Implementation(),
+        [typeof(IDependency2)] = () => new Dependency2Implementation(),
+        [typeof(IDependency3)] = () => new Dependency3Implementation(),
+    };
 
     bool NoArgumentMethod()
     {
@@ -111,6 +106,23 @@ class EventHandlerActionSpec : FixtureSteppable
     class Dependency1Implementation : IDependency1 { }
     class Dependency2Implementation : IDependency2 { }
     class Dependency3Implementation : IDependency3 { }
+
+    public EventHandlerActionSpec()
+    {
+        var fromDIResolver = Substitute.For<IEventHandlerParameterResolver>();
+        fromDIResolver.Resolve(Arg.Any<ParameterInfo>())
+            .Returns(x => ParameterFromDIResolver.TryGetValue(x.Arg<ParameterInfo>().ParameterType, out var resolver) ? resolver() : null);
+
+        ParameterResolver = new ParameterDependencyResolver(
+            Enumerable.Empty<IEventHandlerParameterResolver>(),
+            new EventHandlerParameterResolverBase(
+                new Tuple<Type, IEnumerable<IEventHandlerParameterResolver>>(
+                    typeof(FromDIAttribute),
+                    new[] { fromDIResolver }
+                )
+            )
+        );
+    }
 
     [Example("When a method has no argument")]
     void Ex01()

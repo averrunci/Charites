@@ -21,7 +21,7 @@ internal sealed class EventHandlerExtensionTss : EventHandlerExtension<TestEleme
         eventHandlers.Add(new EventHandlerItemTss(
             eventHandlerAttribute.ElementName, element,
             eventHandlerAttribute.Event,  handlerCreator(null), eventHandlerAttribute.HandledEventsToo,
-            CreateParameterResolver()
+            CreateParameterResolver(element)
         ));
     }
 }

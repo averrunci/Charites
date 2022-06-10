@@ -66,7 +66,7 @@ public class EventHandlerBase<TElement, TItem> where TElement : class where TIte
         private object? sender;
         private object? e;
 
-        private readonly IDictionary<Type, IDictionary<Type, Func<object?>>> parameterResolver = new Dictionary<Type, IDictionary<Type, Func<object?>>>();
+        private readonly EventHandlerParameterResolverBase parameterResolverBase = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Executor"/> class
@@ -106,34 +106,40 @@ public class EventHandlerBase<TElement, TItem> where TElement : class where TIte
         /// <typeparam name="T">The type of the parameter to inject to.</typeparam>
         /// <param name="resolver">The function to resolve the parameter of the specified type.</param>
         /// <returns>The instance of the <see cref="Executor"/></returns>
-        [Obsolete("This method is obsolete. Use the Resolve<TAttribute, TParameter>(Func<object?>) method instead.")]
+        [Obsolete("This method is obsolete. Use the ResolveFromDI<T>(Func<object?>) method instead.")]
         public Executor Resolve<T>(Func<object?> resolver)
         {
-            return Resolve<FromDIAttribute, T>(resolver);
+            return ResolveFromDI<T>(resolver);
         }
 
         /// <summary>
-        /// Resolves a parameter of the specified attribute type and parameter type using the specified resolver.
+        /// Resolves a parameter specified by the specified attribute type using the specified resolver.
         /// </summary>
-        /// <typeparam name="TAttribute">The type of the attribute that specifies the parameter.</typeparam>
-        /// <typeparam name="TParameter">The type of the parameter that is resolved by the specified resolver.</typeparam>
+        /// <typeparam name="TAttribute">The type of the attribute that specified to the parameter.</typeparam>
+        /// <param name="resolver">The resolver to resolve the parameter specified by the specified attribute type.</param>
+        /// <returns>The instance of the <see cref="Executor"/>.</returns>
+        public Executor Resolve<TAttribute>(IEventHandlerParameterResolver resolver) where TAttribute : Attribute
+        {
+            parameterResolverBase.Add<TAttribute>(resolver);
+            return this;
+        }
+
+        /// <summary>
+        /// Resolves a parameter specified by the <see cref="FromDIAttribute"/> attribute using the specified resolver.
+        /// </summary>
+        /// <typeparam name="T">The type of the parameter.</typeparam>
         /// <param name="resolver">The function to resolve the parameter of the specified type.</param>
         /// <returns>The instance of the <see cref="Executor"/>.</returns>
-        public Executor Resolve<TAttribute, TParameter>(Func<object?> resolver) where TAttribute : Attribute
+        public Executor ResolveFromDI<T>(Func<object?> resolver)
         {
-            if (!parameterResolver.ContainsKey(typeof(TAttribute)))
-            {
-                parameterResolver[typeof(TAttribute)] = new Dictionary<Type, Func<object?>>();
-            }
-            parameterResolver[typeof(TAttribute)][typeof(TParameter)] = resolver;
-            return this;
+            return Resolve<FromDIAttribute>(new DefaultEventHandlerParameterFromDIResolver(typeof(T), resolver));
         }
 
         /// <summary>
         /// Raises the event of the specified name.
         /// </summary>
         /// <param name="eventName">The name of the event to raise.</param>
-        public void Raise(string eventName) => items.ForEach(item => item.Raise(eventName, sender, e, parameterResolver));
+        public void Raise(string eventName) => items.ForEach(item => item.Raise(eventName, sender, e, parameterResolverBase));
 
         /// <summary>
         /// Raises the event of the specified name asynchronously.
@@ -144,7 +150,7 @@ public class EventHandlerBase<TElement, TItem> where TElement : class where TIte
         {
             foreach (var item in items)
             {
-                await item.RaiseAsync(eventName, sender, e, parameterResolver);
+                await item.RaiseAsync(eventName, sender, e, parameterResolverBase);
             }
         }
     }

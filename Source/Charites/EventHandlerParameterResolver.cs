@@ -12,6 +12,24 @@ namespace Charites.Windows.Mvc;
 public abstract class EventHandlerParameterResolver<TAttribute> : IEventHandlerParameterResolver where TAttribute: Attribute
 {
     /// <summary>
+    /// Gets the element to which the controller that has the event handler whose parameter is resolved by this resolver is attached.
+    /// </summary>
+    protected object? AssociatedElement { get; }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EventHandlerParameterResolver{TAttribute}"/> class
+    /// with the specified element to which the controller that has the event handler whose parameter
+    /// is resolved by this resolver is attached.
+    /// </summary>
+    /// <param name="associatedElement">
+    /// The element to which the controller that has the event handler is attached whose parameter is resolved by this resolver is attached.
+    /// </param>
+    protected EventHandlerParameterResolver(object? associatedElement)
+    {
+        AssociatedElement = associatedElement;
+    }
+
+    /// <summary>
     /// Resolves a parameter with the specified <see cref="ParameterInfo"/>.
     /// </summary>
     /// <param name="parameter">The <see cref="ParameterInfo"/> from which a parameter is resolved.</param>
