@@ -147,6 +147,16 @@ public class EventHandlerBase<TElement, TItem> where TElement : class where TIte
         }
 
         /// <summary>
+        /// Resolves a parameter specified by the <see cref="FromDataContextAttribute"/> attribute using the specified data context.
+        /// </summary>
+        /// <param name="dataContext">The data context to inject to the parameter.</param>
+        /// <returns>The instance of the <see cref="Executor"/>.</returns>
+        public Executor ResolveFromDataContext(object? dataContext)
+        {
+            return Resolve<FromDataContextAttribute>(new DefaultEventHandlerParameterFromDataContextResolver(dataContext));
+        }
+
+        /// <summary>
         /// Raises the event of the specified name.
         /// </summary>
         /// <param name="eventName">The name of the event to raise.</param>

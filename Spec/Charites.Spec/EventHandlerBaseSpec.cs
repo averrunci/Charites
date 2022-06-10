@@ -59,6 +59,8 @@ class EventHandlerBaseSpec : FixtureSteppable
     IDependency2 Dependency2 { get; } = new Dependency2Implementation();
     IDependency3 Dependency3 { get; } = new Dependency3Implementation();
 
+    TestControllers.TestDataContext DataContext { get; } = new();
+
     int HandleEvent1CalledCount { get; set; }
     int HandleEvent2CalledCount { get; set; }
     int HandleEvent3CalledCount { get; set; }
@@ -83,9 +85,9 @@ class EventHandlerBaseSpec : FixtureSteppable
     delegate void HandleEvent1Callback();
     delegate void HandleEvent2Callback(object e);
     delegate void HandleEvent3Callback(object sender, object e);
-    delegate void HandleEvent4Callback(IDependency1 dependency1, IDependency2 dependency2, IDependency3 dependency3, TestElement element);
-    delegate void HandleEvent5Callback(IDependency1 dependency1, object e, IDependency2 dependency2, IDependency3 dependency3, TestElement element);
-    delegate void HandleEvent6Callback(IDependency1 dependency1, object sender, IDependency2 dependency2, object e, IDependency3 dependency3, TestElement element);
+    delegate void HandleEvent4Callback(IDependency1 dependency1, IDependency2 dependency2, IDependency3 dependency3, TestElement element, TestControllers.TestDataContext dataContext);
+    delegate void HandleEvent5Callback(IDependency1 dependency1, object e, IDependency2 dependency2, IDependency3 dependency3, TestElement element, TestControllers.TestDataContext dataContext);
+    delegate void HandleEvent6Callback(IDependency1 dependency1, object sender, IDependency2 dependency2, object e, IDependency3 dependency3, TestElement element, TestControllers.TestDataContext dataContext);
 
     void HandleEvent1()
     {
@@ -102,19 +104,19 @@ class EventHandlerBaseSpec : FixtureSteppable
         if (sender == Sender && e == Args) ++HandleEvent3CalledCount;
     }
 
-    void HandleEvent4([FromDI] IDependency1 dependency1, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3, [FromElement] TestElement element)
+    void HandleEvent4([FromDI] IDependency1 dependency1, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3, [FromElement] TestElement element, [FromDataContext] TestControllers.TestDataContext dataContext)
     {
-        if (dependency1 == Dependency1 && dependency2 == Dependency2 && dependency3 == Dependency3 && element.Name == nameof(element)) ++HandleEvent4CalledCount;
+        if (dependency1 == Dependency1 && dependency2 == Dependency2 && dependency3 == Dependency3 && element.Name == nameof(element) && dataContext == DataContext) ++HandleEvent4CalledCount;
     }
 
-    void HandleEvent5([FromDI] IDependency1 dependency1, object e, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3, [FromElement(Name = "Element")] TestElement element)
+    void HandleEvent5([FromDI] IDependency1 dependency1, object e, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3, [FromElement(Name = "Element")] TestElement element, [FromDataContext] TestControllers.TestDataContext dataContext)
     {
-        if (e == Args && dependency1 == Dependency1 && dependency2 == Dependency2 && dependency3 == Dependency3 && element.Name == "Element") ++HandleEvent5CalledCount;
+        if (e == Args && dependency1 == Dependency1 && dependency2 == Dependency2 && dependency3 == Dependency3 && element.Name == "Element" && dataContext == DataContext) ++HandleEvent5CalledCount;
     }
 
-    void HandleEvent6([FromDI] IDependency1 dependency1, object sender, [FromDI] IDependency2 dependency2, object e, [FromDI] IDependency3 dependency3, [FromElement] TestElement element)
+    void HandleEvent6([FromDI] IDependency1 dependency1, object sender, [FromDI] IDependency2 dependency2, object e, [FromDI] IDependency3 dependency3, [FromElement] TestElement element, [FromDataContext] TestControllers.TestDataContext dataContext)
     {
-        if (sender == Sender && e == Args && dependency1 == Dependency1 && dependency2 == Dependency2 && dependency3 == Dependency3 && element.Name == nameof(element)) ++HandleEvent6CalledCount;
+        if (sender == Sender && e == Args && dependency1 == Dependency1 && dependency2 == Dependency2 && dependency3 == Dependency3 && element.Name == nameof(element) && dataContext == DataContext) ++HandleEvent6CalledCount;
     }
 
     async Task HandleEvent1Async()
@@ -135,22 +137,22 @@ class EventHandlerBaseSpec : FixtureSteppable
         HandleEvent3(sender, e);
     }
 
-    async Task HandleEvent4Async([FromDI] IDependency1 dependency1, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3, [FromElement] TestElement element)
+    async Task HandleEvent4Async([FromDI] IDependency1 dependency1, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3, [FromElement] TestElement element, [FromDataContext] TestControllers.TestDataContext dataContext)
     {
         await Task.Delay(10);
-        HandleEvent4(dependency1, dependency2, dependency3, element);
+        HandleEvent4(dependency1, dependency2, dependency3, element, dataContext);
     }
 
-    async Task HandleEvent5Async([FromDI] IDependency1 dependency1, object e, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3, [FromElement(Name = "Element")] TestElement element)
+    async Task HandleEvent5Async([FromDI] IDependency1 dependency1, object e, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3, [FromElement(Name = "Element")] TestElement element, [FromDataContext] TestControllers.TestDataContext dataContext)
     {
         await Task.Delay(10);
-        HandleEvent5(dependency1, e, dependency2, dependency3, element);
+        HandleEvent5(dependency1, e, dependency2, dependency3, element, dataContext);
     }
 
-    async Task HandleEvent6Async([FromDI] IDependency1 dependency1, object sender, [FromDI] IDependency2 dependency2, object e, [FromDI] IDependency3 dependency3, [FromElement] TestElement element)
+    async Task HandleEvent6Async([FromDI] IDependency1 dependency1, object sender, [FromDI] IDependency2 dependency2, object e, [FromDI] IDependency3 dependency3, [FromElement] TestElement element, [FromDataContext] TestControllers.TestDataContext dataContext)
     {
         await Task.Delay(10);
-        HandleEvent6(dependency1, sender, dependency2, e, dependency3, element);
+        HandleEvent6(dependency1, sender, dependency2, e, dependency3, element, dataContext);
     }
 
     Delegate CreateAsyncDelegate(string name) => typeof(EventHandlerAction).GetMethod(nameof(EventHandlerAction.OnHandled))?.CreateDelegate(typeof(HandleEvent3Callback), new EventHandlerAction(GetType().GetMethod(name, BindingFlags.NonPublic | BindingFlags.Instance) ?? throw new InvalidOperationException(), this)) ?? throw new InvalidOperationException();
@@ -248,6 +250,7 @@ class EventHandlerBaseSpec : FixtureSteppable
                 .ResolveFromDI<IDependency2>(() => Dependency2)
                 .ResolveFromDI<IDependency3>(() => Dependency3)
                 .ResolveFromElement("element", new TestElement("element"))
+                .ResolveFromDataContext(DataContext)
                 .Raise(Event4)
         );
         Then("the event should be handled with the parameters specified by the attribute", () => AssertAttributedParameterEventHandlerCalled(1, 0, 0));
@@ -258,6 +261,7 @@ class EventHandlerBaseSpec : FixtureSteppable
                 .ResolveFromDI<IDependency2>(() => Dependency2)
                 .ResolveFromDI<IDependency3>(() => Dependency3)
                 .ResolveFromElement("Element", new TestElement("Element"))
+                .ResolveFromDataContext(DataContext)
                 .Raise(Event5)
         );
         Then("the event should be handled with the parameters specified by the attribute and event data", () => AssertAttributedParameterEventHandlerCalled(0, 1, 0));
@@ -269,6 +273,7 @@ class EventHandlerBaseSpec : FixtureSteppable
                 .ResolveFromDI<IDependency2>(() => Dependency2)
                 .ResolveFromDI<IDependency3>(() => Dependency3)
                 .ResolveFromElement("element", new TestElement("element"))
+                .ResolveFromDataContext(DataContext)
                 .Raise(Event6)
         );
         Then("the event should be handled with the parameters specified by the attribute, sender object and event data", () => AssertAttributedParameterEventHandlerCalled(0, 0, 2));
@@ -290,6 +295,7 @@ class EventHandlerBaseSpec : FixtureSteppable
                 .ResolveFromDI<IDependency2>(() => Dependency2)
                 .ResolveFromDI<IDependency3>(() => Dependency3)
                 .ResolveFromElement("element", new TestElement("element"))
+                .ResolveFromDataContext(DataContext)
                 .RaiseAsync(Event4)
         );
         Then("the event should be handled with the parameters specified by the attribute", () => AssertAttributedParameterEventHandlerCalled(1, 0, 0));
@@ -300,6 +306,7 @@ class EventHandlerBaseSpec : FixtureSteppable
                 .ResolveFromDI<IDependency2>(() => Dependency2)
                 .ResolveFromDI<IDependency3>(() => Dependency3)
                 .ResolveFromElement("Element", new TestElement("Element"))
+                .ResolveFromDataContext(DataContext)
                 .RaiseAsync(Event5)
         );
         Then("the event should be handled with the parameters specified by the attribute and event data", () => AssertAttributedParameterEventHandlerCalled(0, 1, 0));
@@ -311,6 +318,7 @@ class EventHandlerBaseSpec : FixtureSteppable
                 .ResolveFromDI<IDependency2>(() => Dependency2)
                 .ResolveFromDI<IDependency3>(() => Dependency3)
                 .ResolveFromElement("element", new TestElement("element"))
+                .ResolveFromDataContext(DataContext)
                 .RaiseAsync(Event6)
         );
         Then("the event should be handled with the parameters specified by the attribute, sender object and event data", () => AssertAttributedParameterEventHandlerCalled(0, 0, 2));

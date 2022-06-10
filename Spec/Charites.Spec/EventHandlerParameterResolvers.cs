@@ -26,4 +26,16 @@ internal static class EventHandlerParameterResolvers
 
         protected override object FindElement(string name) => new TestElement(name);
     }
+
+    public class EventHandlerParameterFromDataContextResolverTss : EventHandlerParameterFromDataContextResolver
+    {
+        private readonly object? dataContext;
+
+        public EventHandlerParameterFromDataContextResolverTss(object? dataContext) : base(null)
+        {
+            this.dataContext = dataContext;
+        }
+
+        protected override object? FindDataContext() => dataContext;
+    }
 }

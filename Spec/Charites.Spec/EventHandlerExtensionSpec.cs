@@ -20,7 +20,7 @@ class EventHandlerExtensionSpec : FixtureSteppable
     Action NoArgumentAssertionHandler { get; }
     Action<object> OneArgumentAssertionHandler { get; }
     Action<object, object> TwoArgumentsAssertionHandler { get; }
-    Action<TestControllers.IDependency1, TestControllers.IDependency2, TestControllers.IDependency3, TestElement> AttributedArgumentsAssertionHandler { get; }
+    Action<TestControllers.IDependency1, TestControllers.IDependency2, TestControllers.IDependency3, TestElement, TestControllers.TestDataContext> AttributedArgumentsAssertionHandler { get; }
 
     bool NoArgumentHandlerCalled { get; set; }
     bool OneArgumentHandlerCalled { get; set; }
@@ -34,6 +34,7 @@ class EventHandlerExtensionSpec : FixtureSteppable
     TestControllers.IDependency2 Dependency2 { get; } = new TestControllers.Dependency2();
     TestControllers.IDependency3 Dependency3 { get; } = new TestControllers.Dependency3();
 
+    TestControllers.TestDataContext DataContext { get; } = new();
 
     class TestEventHandlerParameterResolver1 : IEventHandlerParameterResolver
     {
@@ -54,7 +55,7 @@ class EventHandlerExtensionSpec : FixtureSteppable
         NoArgumentAssertionHandler = () => NoArgumentHandlerCalled = true;
         OneArgumentAssertionHandler = e => OneArgumentHandlerCalled = e == Args;
         TwoArgumentsAssertionHandler = (sender, e) => TwoArgumentsHandlerCalled = sender == Sender && e == Args;
-        AttributedArgumentsAssertionHandler = (dependency1, dependency2, dependency3, element) => AttributedArgumentsHandlerCalled = dependency1 == Dependency1 && dependency2 == Dependency2 && dependency3 == Dependency3 && element.Name == "element";
+        AttributedArgumentsAssertionHandler = (dependency1, dependency2, dependency3, element, dataContext) => AttributedArgumentsHandlerCalled = dependency1 == Dependency1 && dependency2 == Dependency2 && dependency3 == Dependency3 && element.Name == "element" && dataContext == DataContext;
     }
 
     bool AssertEventHandlerCalled(bool expectedNoArgumentHandlerCalled, bool expectedOneArgumentHandlerCalled, bool expectedTwoArgumentsHandlerCalled)
@@ -351,6 +352,7 @@ class EventHandlerExtensionSpec : FixtureSteppable
                 .ResolveFromDI<TestControllers.IDependency2>(() => Dependency2)
                 .ResolveFromDI<TestControllers.IDependency3>(() => Dependency3)
                 .ResolveFromElement("element", new TestElement("element"))
+                .ResolveFromDataContext(DataContext)
                 .Raise("Click")
         );
         Then("the event should be handled", () => AssertEventHandlerCalled(true, false, false, true));
@@ -360,6 +362,7 @@ class EventHandlerExtensionSpec : FixtureSteppable
                 .ResolveFromDI<TestControllers.IDependency2>(() => Dependency2)
                 .ResolveFromDI<TestControllers.IDependency3>(() => Dependency3)
                 .ResolveFromElement("element", new TestElement("element"))
+                .ResolveFromDataContext(DataContext)
                 .RaiseAsync("Click")
         );
         Then("the event should be handled", () => AssertEventHandlerCalled(true, false, false, true));
@@ -372,6 +375,7 @@ class EventHandlerExtensionSpec : FixtureSteppable
                 .ResolveFromDI<TestControllers.IDependency2>(() => Dependency2)
                 .ResolveFromDI<TestControllers.IDependency3>(() => Dependency3)
                 .ResolveFromElement("element", new TestElement("element"))
+                .ResolveFromDataContext(DataContext)
                 .Raise("Click")
         );
         Then("the event should be handled", () => AssertEventHandlerCalled(false, true, false, true));
@@ -382,6 +386,7 @@ class EventHandlerExtensionSpec : FixtureSteppable
                 .ResolveFromDI<TestControllers.IDependency2>(() => Dependency2)
                 .ResolveFromDI<TestControllers.IDependency3>(() => Dependency3)
                 .ResolveFromElement("element", new TestElement("element"))
+                .ResolveFromDataContext(DataContext)
                 .RaiseAsync("Click")
         );
         Then("the event should be handled", () => AssertEventHandlerCalled(false, true, false, true));
@@ -395,6 +400,7 @@ class EventHandlerExtensionSpec : FixtureSteppable
                 .ResolveFromDI<TestControllers.IDependency2>(() => Dependency2)
                 .ResolveFromDI<TestControllers.IDependency3>(() => Dependency3)
                 .ResolveFromElement("element", new TestElement("element"))
+                .ResolveFromDataContext(DataContext)
                 .Raise("Click")
         );
         Then("the event should be handled", () => AssertEventHandlerCalled(false, false, true, true));
@@ -406,6 +412,7 @@ class EventHandlerExtensionSpec : FixtureSteppable
                 .ResolveFromDI<TestControllers.IDependency2>(() => Dependency2)
                 .ResolveFromDI<TestControllers.IDependency3>(() => Dependency3)
                 .ResolveFromElement("element", new TestElement("element"))
+                .ResolveFromDataContext(DataContext)
                 .RaiseAsync("Click")
         );
         Then("the event should be handled", () => AssertEventHandlerCalled(false, false, true, true));
@@ -422,6 +429,7 @@ class EventHandlerExtensionSpec : FixtureSteppable
                 .ResolveFromDI<TestControllers.IDependency2>(() => Dependency2)
                 .ResolveFromDI<TestControllers.IDependency3>(() => Dependency3)
                 .ResolveFromElement("element", new TestElement("element"))
+                .ResolveFromDataContext(DataContext)
                 .Raise("Click")
         );
         Then("the event should not be handled", () => AssertEventHandlerCalled(false, false, false, false));
@@ -431,6 +439,7 @@ class EventHandlerExtensionSpec : FixtureSteppable
                 .ResolveFromDI<TestControllers.IDependency2>(() => Dependency2)
                 .ResolveFromDI<TestControllers.IDependency3>(() => Dependency3)
                 .ResolveFromElement("element", new TestElement("element"))
+                .ResolveFromDataContext(DataContext)
                 .RaiseAsync("Click")
         );
         Then("the event should not be handled", () => AssertEventHandlerCalled(false, false, false, false));
@@ -443,6 +452,7 @@ class EventHandlerExtensionSpec : FixtureSteppable
                 .ResolveFromDI<TestControllers.IDependency2>(() => Dependency2)
                 .ResolveFromDI<TestControllers.IDependency3>(() => Dependency3)
                 .ResolveFromElement("element", new TestElement("element"))
+                .ResolveFromDataContext(DataContext)
                 .Raise("Click")
         );
         Then("the event should not be handled", () => AssertEventHandlerCalled(false, false, false, false));
@@ -453,6 +463,7 @@ class EventHandlerExtensionSpec : FixtureSteppable
                 .ResolveFromDI<TestControllers.IDependency2>(() => Dependency2)
                 .ResolveFromDI<TestControllers.IDependency3>(() => Dependency3)
                 .ResolveFromElement("element", new TestElement("element"))
+                .ResolveFromDataContext(DataContext)
                 .RaiseAsync("Click")
         );
         Then("the event should not be handled", () => AssertEventHandlerCalled(false, false, false, false));
@@ -466,6 +477,7 @@ class EventHandlerExtensionSpec : FixtureSteppable
                 .ResolveFromDI<TestControllers.IDependency2>(() => Dependency2)
                 .ResolveFromDI<TestControllers.IDependency3>(() => Dependency3)
                 .ResolveFromElement("element", new TestElement("element"))
+                .ResolveFromDataContext(DataContext)
                 .Raise("Click")
         );
         Then("the event should not be handled", () => AssertEventHandlerCalled(false, false, false, false));
@@ -477,6 +489,7 @@ class EventHandlerExtensionSpec : FixtureSteppable
                 .ResolveFromDI<TestControllers.IDependency2>(() => Dependency2)
                 .ResolveFromDI<TestControllers.IDependency3>(() => Dependency3)
                 .ResolveFromElement("element", new TestElement("element"))
+                .ResolveFromDataContext(DataContext)
                 .RaiseAsync("Click")
         );
         Then("the event should not be handled", () => AssertEventHandlerCalled(false, false, false, false));
