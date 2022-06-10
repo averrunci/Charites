@@ -72,28 +72,31 @@ class EventHandlerActionSpec : FixtureSteppable
         throw new Exception();
     }
 
-    bool AttributedParametersMethod([FromDI] IDependency1 dependency1, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3)
+    bool AttributedParametersMethod([FromDI] IDependency1 dependency1, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3, [FromElement] TestElement element)
     {
         AttributedParametersMethodCalled = dependency1.GetType() == typeof(Dependency1Implementation) &&
             dependency2.GetType() == typeof(Dependency2Implementation) &&
-            dependency3.GetType() == typeof(Dependency3Implementation);
+            dependency3.GetType() == typeof(Dependency3Implementation) &&
+            element.Name == nameof(element);
         return AttributedParametersMethodCalled;
     }
 
-    bool OneArgumentAttributedParametersMethod([FromDI] IDependency1 dependency1, object e, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3)
+    bool OneArgumentAttributedParametersMethod([FromDI] IDependency1 dependency1, object e, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3, [FromElement(Name = "Element")] TestElement element)
     {
         OneArgumentAttributedParametersMethodCalled = dependency1.GetType() == typeof(Dependency1Implementation) &&
             dependency2.GetType() == typeof(Dependency2Implementation) &&
             dependency3.GetType() == typeof(Dependency3Implementation) &&
+            element.Name == "Element" &&
             e == Args;
         return OneArgumentAttributedParametersMethodCalled;
     }
 
-    bool TwoArgumentsAttributedParametersMethod([FromDI] IDependency1 dependency1, object sender, [FromDI] IDependency2 dependency2, object e, [FromDI] IDependency3 dependency3)
+    bool TwoArgumentsAttributedParametersMethod([FromDI] IDependency1 dependency1, object sender, [FromDI] IDependency2 dependency2, object e, [FromDI] IDependency3 dependency3, [FromElement] TestElement element)
     {
         TwoArgumentsAttributedParametersMethodCalled = dependency1.GetType() == typeof(Dependency1Implementation) &&
             dependency2.GetType() == typeof(Dependency2Implementation) &&
             dependency3.GetType() == typeof(Dependency3Implementation) &&
+            element.Name == nameof(element) &&
             sender == Sender && e == Args;
         return TwoArgumentsAttributedParametersMethodCalled;
     }
@@ -109,18 +112,12 @@ class EventHandlerActionSpec : FixtureSteppable
 
     public EventHandlerActionSpec()
     {
-        var fromDIResolver = Substitute.For<IEventHandlerParameterResolver>();
-        fromDIResolver.Resolve(Arg.Any<ParameterInfo>())
-            .Returns(x => ParameterFromDIResolver.TryGetValue(x.Arg<ParameterInfo>().ParameterType, out var resolver) ? resolver() : null);
-
         ParameterResolver = new ParameterDependencyResolver(
-            Enumerable.Empty<IEventHandlerParameterResolver>(),
-            new EventHandlerParameterResolverBase(
-                new Tuple<Type, IEnumerable<IEventHandlerParameterResolver>>(
-                    typeof(FromDIAttribute),
-                    new[] { fromDIResolver }
-                )
-            )
+            new IEventHandlerParameterResolver[]
+            {
+                new EventHandlerParameterResolvers.EventHandlerParameterFromDIResolverTss(ParameterFromDIResolver),
+                new EventHandlerParameterResolvers.EventHandlerParameterFromElementResolverTss()
+            }
         );
     }
 

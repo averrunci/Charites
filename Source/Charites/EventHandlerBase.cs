@@ -136,6 +136,17 @@ public class EventHandlerBase<TElement, TItem> where TElement : class where TIte
         }
 
         /// <summary>
+        /// Resolves a parameter specified by the <see cref="FromElementAttribute"/> attribute using the specified name and element.
+        /// </summary>
+        /// <param name="name">The name of the element.</param>
+        /// <param name="element">The element to inject to the parameter.</param>
+        /// <returns>The instance of the <see cref="Executor"/>.</returns>
+        public Executor ResolveFromElement(string name, TElement? element)
+        {
+            return Resolve<FromElementAttribute>(new DefaultEventHandlerParameterFromElementResolver(name, element));
+        }
+
+        /// <summary>
         /// Raises the event of the specified name.
         /// </summary>
         /// <param name="eventName">The name of the event to raise.</param>

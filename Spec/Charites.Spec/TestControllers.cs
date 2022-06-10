@@ -640,55 +640,55 @@ internal static class TestControllers
     public class EventHandlerOfMethodWithParametersSpecifiedByAttributeController
     {
         [EventHandler(ElementName = "Element1", Event = "Click")]
-        public void OnElement1Click([FromDI] IDependency1 dependency1, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3)
+        public void OnElement1Click([FromDI] IDependency1 dependency1, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3, [FromElement] TestElement element)
         {
             noArgumentHandler();
-            dependencyArgumentsHandler(dependency1, dependency2, dependency3);
+            attributedArgumentsHandler(dependency1, dependency2, dependency3, element);
         }
-        public async Task Element4_Click([FromDI] IDependency1 dependency1, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3)
+        public async Task Element4_Click([FromDI] IDependency1 dependency1, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3, [FromElement] TestElement element)
         {
             await Task.Delay(10);
             noArgumentHandler();
-            dependencyArgumentsHandler(dependency1, dependency2, dependency3);
+            attributedArgumentsHandler(dependency1, dependency2, dependency3, element);
         }
         private readonly Action noArgumentHandler;
 
-        private void Element2_Click([FromDI] IDependency1 dependency1, object e, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3)
+        private void Element2_Click([FromDI] IDependency1 dependency1, object e, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3, [FromElement] TestElement element)
         {
             oneArgumentHandler(e);
-            dependencyArgumentsHandler(dependency1, dependency2, dependency3);
+            attributedArgumentsHandler(dependency1, dependency2, dependency3, element);
         }
         [EventHandler(ElementName = "Element5", Event = "Click")]
-        private async Task OnElement5Click([FromDI] IDependency1 dependency1, object e, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3)
+        private async Task OnElement5Click([FromDI] IDependency1 dependency1, object e, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3, [FromElement] TestElement element)
         {
             await Task.Delay(10);
             oneArgumentHandler(e);
-            dependencyArgumentsHandler(dependency1, dependency2, dependency3);
+            attributedArgumentsHandler(dependency1, dependency2, dependency3, element);
         }
         private readonly Action<object> oneArgumentHandler;
 
         [EventHandler(ElementName = "Element3", Event = "Click")]
-        private void OnElement3Click([FromDI] IDependency1 dependency1, object sender, [FromDI] IDependency2 dependency2, object e, [FromDI] IDependency3 dependency3)
+        private void OnElement3Click([FromDI] IDependency1 dependency1, object sender, [FromDI] IDependency2 dependency2, object e, [FromDI] IDependency3 dependency3, [FromElement] TestElement element)
         {
             twoArgumentsHandler(sender, e);
-            dependencyArgumentsHandler(dependency1, dependency2, dependency3);
+            attributedArgumentsHandler(dependency1, dependency2, dependency3, element);
         }
-        private async Task Element6_Click([FromDI] IDependency1 dependency1, object sender, [FromDI] IDependency2 dependency2, object e, [FromDI] IDependency3 dependency3)
+        private async Task Element6_Click([FromDI] IDependency1 dependency1, object sender, [FromDI] IDependency2 dependency2, object e, [FromDI] IDependency3 dependency3, [FromElement] TestElement element)
         {
             await Task.Delay(10);
             twoArgumentsHandler(sender, e);
-            dependencyArgumentsHandler(dependency1, dependency2, dependency3);
+            attributedArgumentsHandler(dependency1, dependency2, dependency3, element);
         }
         private readonly Action<object, object> twoArgumentsHandler;
 
-        private readonly Action<IDependency1, IDependency2, IDependency3> dependencyArgumentsHandler;
+        private readonly Action<IDependency1, IDependency2, IDependency3, TestElement> attributedArgumentsHandler;
 
-        public EventHandlerOfMethodWithParametersSpecifiedByAttributeController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler, Action<IDependency1, IDependency2, IDependency3> dependencyArgumentsAssertionHandler)
+        public EventHandlerOfMethodWithParametersSpecifiedByAttributeController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler, Action<IDependency1, IDependency2, IDependency3, TestElement> attributedArgumentsAssertionHandler)
         {
             noArgumentHandler = noArgumentAssertionHandler;
             oneArgumentHandler = oneArgumentAssertionHandler;
             twoArgumentsHandler = twoArgumentsAssertionHandler;
-            dependencyArgumentsHandler = dependencyArgumentsAssertionHandler;
+            attributedArgumentsHandler = attributedArgumentsAssertionHandler;
         }
     }
 
