@@ -11,6 +11,9 @@ namespace Charites.Windows.Mvc;
 /// </summary>
 public class EventHandlerParameterResolverBase : IEventHandlerParameterResolver
 {
+    /// <summary>
+    /// Gets resolvers to resolve parameters an event handler.
+    /// </summary>
     protected IDictionary<Type, ICollection<IEventHandlerParameterResolver>> Resolvers { get; } = new Dictionary<Type, ICollection<IEventHandlerParameterResolver>>();
 
     /// <summary>
