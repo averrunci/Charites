@@ -253,10 +253,36 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
     /// </summary>
     /// <param name="delegate">The delegate of the method to handle the event.</param>
     /// <param name="handlerType">The type of the event handler.</param>
+    /// <returns>The delegate to handle the event.</returns>
+    [Obsolete("This method is obsolete. Use the CreateEventHandler(Delegate?, Type?, TElement?) method instead.")]
+    protected Delegate? CreateEventHandler(Delegate? @delegate, Type? handlerType)
+        => @delegate is null ? null : CreateEventHandler(@delegate.Method, @delegate.Target, handlerType);
+
+    /// <summary>
+    /// Creates an event handler with the specified delegate and type of the handler.
+    /// </summary>
+    /// <param name="delegate">The delegate of the method to handle the event.</param>
+    /// <param name="handlerType">The type of the event handler.</param>
     /// <param name="element">The element that raises the event.</param>
     /// <returns>The delegate to handle the event.</returns>
-    protected Delegate? CreateEventHandler(Delegate? @delegate, Type? handlerType, TElement? element = null)
+    protected Delegate? CreateEventHandler(Delegate? @delegate, Type? handlerType, TElement? element)
         => @delegate is null ? null : CreateEventHandler(@delegate.Method, @delegate.Target, handlerType, element);
+
+    /// <summary>
+    /// Creates an event handler with the specified method, target, and type of the handler.
+    /// </summary>
+    /// <param name="method">The method to handle the event.</param>
+    /// <param name="target">The target object to invoke the method to handle the event.</param>
+    /// <param name="handlerType">The type of the event handler.</param>
+    /// <returns>The delegate to handle the event.</returns>
+    [Obsolete("This method is obsolete. Use the CreateEventHandler(MethodInfo, object?, Type?, TElement?) method instead.")]
+    protected virtual Delegate? CreateEventHandler(MethodInfo method, object? target, Type? handlerType)
+    {
+        var action = CreateEventHandlerAction(method, target);
+        return action.GetType()
+            .GetMethod(nameof(EventHandlerAction.OnHandled))
+            ?.CreateDelegate(handlerType ?? typeof(Handler), action);
+    }
 
     /// <summary>
     /// Creates an event handler with the specified method, target, and type of the handler.
@@ -266,7 +292,7 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
     /// <param name="handlerType">The type of the event handler.</param>
     /// <param name="element">The element that raises the event.</param>
     /// <returns>The delegate to handle the event.</returns>
-    protected virtual Delegate? CreateEventHandler(MethodInfo method, object? target, Type? handlerType, TElement? element = null)
+    protected virtual Delegate? CreateEventHandler(MethodInfo method, object? target, Type? handlerType, TElement? element)
     {
         var action = CreateEventHandlerAction(method, target, element);
         return action.GetType()
@@ -279,9 +305,19 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
     /// </summary>
     /// <param name="method">The method to handle the event.</param>
     /// <param name="target">The target object to invoke the method to handle the event.</param>
+    /// <returns>The action to handle the event.</returns>
+    [Obsolete("This method is obsolete. Use the CreateEventHandlerAction(MethodInfo, object?, TElement?) method instead.")]
+    protected virtual EventHandlerAction CreateEventHandlerAction(MethodInfo method, object? target)
+        => new(method, target, new ParameterDependencyResolver(CreateParameterResolver(null)));
+
+    /// <summary>
+    /// Creates an action to handle an event with the specified method and target.
+    /// </summary>
+    /// <param name="method">The method to handle the event.</param>
+    /// <param name="target">The target object to invoke the method to handle the event.</param>
     /// <param name="element">The element that raises the event.</param>
     /// <returns>The action to handle the event.</returns>
-    protected virtual EventHandlerAction CreateEventHandlerAction(MethodInfo method, object? target, TElement? element = null)
+    protected virtual EventHandlerAction CreateEventHandlerAction(MethodInfo method, object? target, TElement? element)
         => new(method, target, new ParameterDependencyResolver(CreateParameterResolver(element)));
 
     /// <summary>
