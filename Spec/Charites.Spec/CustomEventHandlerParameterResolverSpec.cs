@@ -41,7 +41,7 @@ class CustomEventHandlerParameterResolverSpec : FixtureSteppable
 }
 
 [AttributeUsage(AttributeTargets.Parameter)]
-class FromConstantAttribute : Attribute { }
+class FromConstantAttribute : EventHandlerParameterAttribute { }
 
 class DefaultEventHandlerParameterFromConstantResolver : IEventHandlerParameterResolver
 {

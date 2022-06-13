@@ -8,7 +8,7 @@ namespace Charites.Windows.Mvc;
 /// Specifies the parameter to inject from the element.
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter)]
-public class FromElementAttribute : Attribute
+public class FromElementAttribute : EventHandlerParameterAttribute
 {
     /// <summary>
     /// Gets or sets the name of the element.

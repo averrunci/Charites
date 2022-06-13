@@ -8,6 +8,6 @@ namespace Charites.Windows.Mvc;
 /// Specifies the parameter to inject from the data context.
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter)]
-public class FromDataContextAttribute : Attribute
+public class FromDataContextAttribute : EventHandlerParameterAttribute
 {
 }

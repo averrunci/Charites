@@ -5,9 +5,9 @@
 namespace Charites.Windows.Mvc;
 
 /// <summary>
-/// Specifies the parameter to inject from the DI container.
+/// Specifies the parameter of an event handler to inject a value.
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter)]
-public class FromDIAttribute : EventHandlerParameterAttribute
+public class EventHandlerParameterAttribute : Attribute
 {
 }

@@ -83,9 +83,9 @@ public class ParameterDependencyResolver : IParameterDependencyResolver
     protected virtual object?[] Resolve(MethodInfo method, object? sender, object? e)
     {
         var parameters = method.GetParameters();
-        var parameterCountExceptDependencyInjection = parameters.Count(p => p.GetCustomAttribute<Attribute>() is null);
+        var parameterCountExceptDependencyInjection = parameters.Count(p => p.GetCustomAttribute<EventHandlerParameterAttribute>() is null);
         if (parameterCountExceptDependencyInjection > 2)
-            throw new InvalidOperationException("The length of the method parameters except ones specified by an attribute must be less than 3.");
+            throw new InvalidOperationException("The length of the method parameters except ones specified by the EventHandlerParameterAttribute attribute must be less than 3.");
 
         var specificParameterQueue = new Queue();
         switch (parameterCountExceptDependencyInjection)
@@ -110,7 +110,7 @@ public class ParameterDependencyResolver : IParameterDependencyResolver
     /// <returns>A parameter of the invoked method.</returns>
     protected virtual object? ResolveParameter(ParameterInfo parameter, Queue specificParameterQueue)
     {
-        return parameter.GetCustomAttribute<Attribute>() is null ? specificParameterQueue.Dequeue() : ResolveParameterFromDependency(parameter);
+        return parameter.GetCustomAttribute<EventHandlerParameterAttribute>() is null ? specificParameterQueue.Dequeue() : ResolveParameterFromDependency(parameter);
     }
 
     /// <summary>
