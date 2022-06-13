@@ -308,7 +308,7 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
     /// <returns>The action to handle the event.</returns>
     [Obsolete("This method is obsolete. Use the CreateEventHandlerAction(MethodInfo, object?, TElement?) method instead.")]
     protected virtual EventHandlerAction CreateEventHandlerAction(MethodInfo method, object? target)
-        => new(method, target, new ParameterDependencyResolver(CreateParameterResolver(null)));
+        => new(method, target, CreateParameterDependencyResolver(CreateParameterResolver(null)));
 
     /// <summary>
     /// Creates an action to handle an event with the specified method and target.
@@ -318,7 +318,15 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
     /// <param name="element">The element that raises the event.</param>
     /// <returns>The action to handle the event.</returns>
     protected virtual EventHandlerAction CreateEventHandlerAction(MethodInfo method, object? target, TElement? element)
-        => new(method, target, new ParameterDependencyResolver(CreateParameterResolver(element)));
+        => new(method, target, CreateParameterDependencyResolver(CreateParameterResolver(element)));
+
+    /// <summary>
+    /// Creates the resolver to resolve dependencies of parameters.
+    /// </summary>
+    /// <param name="parameterResolver">The resolver to resolve parameters.</param>
+    /// <returns>The resolver to resolve dependencies of parameters.</returns>
+    protected virtual IParameterDependencyResolver CreateParameterDependencyResolver(IEnumerable<IEventHandlerParameterResolver> parameterResolver)
+        => new ParameterDependencyResolver(parameterResolver);
 
     /// <summary>
     /// Creates a resolver to resolve parameters of an event handler.
