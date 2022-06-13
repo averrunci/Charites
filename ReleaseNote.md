@@ -1,5 +1,49 @@
 # Release note
 
+## v2.1.0
+
+### Add
+
+- Add the IElementFinder interface to find an element.
+- Add the EventHandlerParameterAttribute attribute that is specified to the parameter of an event handler to inject a value.
+- Add the FromElementAttribute attribute that is specified to the parameter to inject from the element in the view.
+- Add the FromDataContextAttribute attribute that is specified to the parameter to inject from the data context in the view.
+- Add the IEventHandlerParameterResolver interface to resolve a parameter specified by the attribute.
+- Add the EventHandlerParameterResolver class that is a base class to implement the IEventHandlerParameterResolver interface.
+- Add the EventHandlerParameterFromDIResolver class that is a base class to resolve a parameter specified by the FromDIAttribute attribute.
+- Add the EventHandlerParameterFromElementResolver class that is a base class to resolve a parameter specified by the FromElementAttribute attribute.
+- Add the EventHandlerParameterFromDataContextResolver class that is a base class to resolve a parameter specified by the FromDataContextAttribute attribute.
+- Add the ResolveFromDI method to the EventHandlerBase.Executor class.
+- Add the ResolveFromElement method to the EventHandlerBase.Executor class.
+- Add the ResolveFromDataContext method to the EventHandlerBase.Executor class.
+- Add the following method in the EventHandlerExtension class so that the EventHandlerExtension uses the IEventHandlerParameterResolver interface:
+  - void Add<TResolver>() where TResolver : IEventHandlerParameterResolver
+  - void Add(Type resolverType)
+  - void Remove<TResolver>() where TResolver : IEventHandlerParameterResolver
+  - void Remove(Type resolverType)
+
+### Change
+
+- Change to use the IElementFinder interface to find an element in the ElementInjector class.
+- Obsolete the following method:
+  - EventHandlerAction class
+    - object? Handle(object?, object?, IDictionary&lt;Type, Func&lt;object?&gt;&gt;?)
+    - IParameterDependencyResolver CreateParameterDependencyResolver(IDictionary&lt;Type, Func&lt;object?&gt;&gt;?)
+  - EventHandlerBase class
+    - Executor Resolve&lt;T&gt;(Func&lt;object?&gt;)
+  - EventHandlerExtension class
+    - Delegate? CreateEventHandler(Delegate?, Type?)
+    - Delegate? CreateEventHandler(MethodInfo, object?, Type?)
+    - EventHandlerAction CreateEventHandlerAction(MethodInfo, object?)
+  - EventHandlerItem class
+    - void Raise(string, object?, object?, IDictionary&lt;Type, Func&lt;object?&gt;&gt;)
+    - Task RaiseAsync(string, object?, object?, IDictionary&lt;Type, Func&lt;object?&gt;&gt;?)
+    - IParameterDependencyResolver CreateParameterDependencyResolver(IDictionary&lt;Type, Func&lt;object?&gt;&gt;?)
+    - object? Handle(Delegate, object?, object?, IDictionary&lt;Type, Func&lt;object?&gt;&gt;?)
+  - ParameterDependencyResolver class
+    - .ctor(IDictionary&lt;Type, Func&lt;object?&gt;&gt;)
+    - .ctor(IEnumerable&lt;IEventHandlerParameterResolver&gt;, IDictionary&lt;Type, Func&lt;object?&gt;&gt;)
+
 ## v2.0.0
 
 ### Change

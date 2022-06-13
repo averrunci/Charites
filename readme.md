@@ -154,6 +154,52 @@ private void ActionButton_Click(object? sender, EventArgs e, [FromDI] IDataLoade
 }
 ```
 
+### FromElementAttribute
+
+This attribute is specified to the parameter.
+Its parameter value is injected from the element of the specified parameter name in the view to which the controller is attached.
+If the name of the element is different from the parameter name,
+the name of the element is specified to the Name property of the FromElementAttribute.
+
+``` csharp
+private void ActionButton_Click([FromElement] ElementType element)
+{
+    // implements the action.
+}
+
+private void ActionButton_Click(EventArgs e, [FromElement(Name = "Element")] ElementType element)
+{
+    // implements the action.
+}
+
+private void ActionButton_Click(object? sender, EventArgs e, [FromElement] ElementType element)
+{
+    // implements the action.
+}
+```
+
+### FromDataContextAttribute
+
+This attribute is specified to the parameter. Its parameter value is injected from the data context of the view
+to which the controller is attached.
+
+``` csharp
+private void ActionButton_Click([DataContext] DataContextType dataContext)
+{
+    // implements the action.
+}
+
+private void ActionButton_Click(EventArgs e, [DataContext] DataContextType dataContext)
+{
+    // implements the action.
+}
+
+private void ActionButton_Click(object? sender, EventArgs e, [DataContext] DataContextType dataContext)
+{
+    // implements the action.
+}
+```
+
 ### DataContextAttribute
 
 This attribute is specified to the field, property, or method to which a data context is injected.
