@@ -47,13 +47,13 @@ class ControllerCollectionSpec : FixtureSteppable
     void Ex01()
     {
         When("a controller is added", () => Controllers.Add(ActualControllers[0]));
-        Then("the controller collection should not subscribe events of the associated element", () => !Controllers.AssociatedElementEventsSubscribed);
+        Then("the controller collection should not subscribe to events of the associated element", () => !Controllers.AssociatedElementEventsSubscribed);
         Then("the DataContext should not be found", () => DataContextFinder.DidNotReceive().Find(Arg.Any<TestElement>()));
         Then("the DataContext should not be injected", () => DataContextInjector.DidNotReceive().Inject(Arg.Any<object?>(), Arg.Any<object>()));
         Then("the Element should not be injected", () => ElementInjector.DidNotReceive().Inject(Arg.Any<TestElement?>(), Arg.Any<object>()));
         Then("the Extensions should not be attached", () => Extensions.ForEach(extension => extension.DidNotReceive().Attach(Arg.Any<object>(), Arg.Any<TestElement>())));
         When("the controller is attached to an element", () => Controllers.AttachTo(Element1));
-        Then("the controller collection should subscribe events of the associated element", () => Controllers.AssociatedElementEventsSubscribed);
+        Then("the controller collection should subscribe to events of the associated element", () => Controllers.AssociatedElementEventsSubscribed);
         Then("the DataContext should be found", () => DataContextFinder.Received().Find(Element1));
         Then("the DataContext should be injected", () => DataContextInjector.Received().Inject(DataContext, ActualControllers[0]));
         Then("the Element should not be injected", () => ElementInjector.DidNotReceive().Inject(Arg.Any<TestElement?>(), Arg.Any<object>()));
@@ -64,14 +64,14 @@ class ControllerCollectionSpec : FixtureSteppable
     void Ex02()
     {
         When("a controller is added", () => Controllers.Add(ActualControllers[0]));
-        Then("the controller collection should not subscribe events of the associated element", () => !Controllers.AssociatedElementEventsSubscribed);
+        Then("the controller collection should not subscribe to events of the associated element", () => !Controllers.AssociatedElementEventsSubscribed);
         Then("the DataContext should not be found", () => DataContextFinder.DidNotReceive().Find(Arg.Any<TestElement>()));
         Then("the DataContext should not be injected", () => DataContextInjector.DidNotReceive().Inject(Arg.Any<object?>(), Arg.Any<object>()));
         Then("the Element should not be injected", () => ElementInjector.DidNotReceive().Inject(Arg.Any<TestElement?>(), Arg.Any<object>()));
         Then("the Extensions should not be attached", () => Extensions.ForEach(extension => extension.DidNotReceive().Attach(Arg.Any<object>(), Arg.Any<TestElement>())));
         When("an element is loaded", () => Element1.Load());
         When("the controller is attached to the element", () => Controllers.AttachTo(Element1));
-        Then("the controller collection should subscribe events of the associated element", () => Controllers.AssociatedElementEventsSubscribed);
+        Then("the controller collection should subscribe to events of the associated element", () => Controllers.AssociatedElementEventsSubscribed);
         Then("the DataContext should be found", () => DataContextFinder.Received().Find(Element1));
         Then("the DataContext should be injected", () => DataContextInjector.Received().Inject(DataContext, ActualControllers[0]));
         Then("the Element should be injected", () => ElementInjector.Received().Inject(Element1, ActualControllers[0]));
@@ -98,7 +98,7 @@ class ControllerCollectionSpec : FixtureSteppable
         ClearReceivedCalls();
 
         When("the controller is detached from the element", () => Controllers.Detach());
-        Then("the controller collection should unsubscribe events of the associated element", () => Controllers.AssociatedElementEventsUnsubscribed);
+        Then("the controller collection should unsubscribe from events of the associated element", () => Controllers.AssociatedElementEventsUnsubscribed);
         Then("the DataContext should be initialized", () => DataContextInjector.Received().Inject(null, ActualControllers[0]));
         Then("the Element should be initialized", () => ElementInjector.Received().Inject(null, ActualControllers[0]));
         Then("the Extensions should be detached", () => Extensions.ForEach(extension => extension.Received().Detach(ActualControllers[0], Element1)));
@@ -107,13 +107,13 @@ class ControllerCollectionSpec : FixtureSteppable
 
         When("the controller is detached again", () => Controllers.Detach());
         Then("the exception should not be thrown", () => true);
-        Then("the controller collection should not be unsubscribed events of the associated element", () => !Controllers.AssociatedElementEventsUnsubscribed);
+        Then("the controller collection should not be unsubscribed from events of the associated element", () => !Controllers.AssociatedElementEventsUnsubscribed);
         Then("the DataContext should not be initialized", () => DataContextInjector.DidNotReceive().Inject(Arg.Any<object?>(), Arg.Any<object>()));
         Then("the Element should not be initialized", () => ElementInjector.DidNotReceive().Inject(Arg.Any<TestElement?>(), Arg.Any<object>()));
         Then("the Extensions should not be detached", () => Extensions.ForEach(extension => extension.DidNotReceive().Detach(Arg.Any<object>(), Arg.Any<TestElement>())));
 
         When("the controller is attached to the element again", () => Controllers.AttachTo(Element1));
-        Then("the controller collection should subscribe events of the associated element", () => Controllers.AssociatedElementEventsSubscribed);
+        Then("the controller collection should subscribe to events of the associated element", () => Controllers.AssociatedElementEventsSubscribed);
         Then("the DataContext should be found", () => DataContextFinder.Received().Find(Element1));
         Then("the DataContext should be injected", () => DataContextInjector.Received().Inject(DataContext, ActualControllers[0]));
         Then("the Element should not be injected", () => ElementInjector.DidNotReceive().Inject(Arg.Any<TestElement?>(), Arg.Any<object>()));
@@ -134,7 +134,7 @@ class ControllerCollectionSpec : FixtureSteppable
     {
         When("attached to an element", () => Controllers.AttachTo(Element1));
         When("a controller is added", () => Controllers.Add(ActualControllers[0]));
-        Then("the controller collection should subscribe events of the associated element", () => Controllers.AssociatedElementEventsSubscribed);
+        Then("the controller collection should subscribe to events of the associated element", () => Controllers.AssociatedElementEventsSubscribed);
         Then("the DataContext should be found", () => DataContextFinder.Received().Find(Element1));
         Then("the DataContext should be injected", () => DataContextInjector.Received().Inject(DataContext, ActualControllers[0]));
         Then("the Element should not be injected", () => ElementInjector.DidNotReceive().Inject(Arg.Any<TestElement?>(), Arg.Any<object>()));
@@ -150,7 +150,7 @@ class ControllerCollectionSpec : FixtureSteppable
         ClearReceivedCalls();
 
         When("the controller is removed", () => Controllers.RemoveAt(0));
-        Then("the controller collection should unsubscribe events of the associated element", () => Controllers.AssociatedElementEventsUnsubscribed);
+        Then("the controller collection should unsubscribe from events of the associated element", () => Controllers.AssociatedElementEventsUnsubscribed);
         Then("the DataContext should be initialized", () => DataContextInjector.Received().Inject(null, ActualControllers[0]));
         Then("the Element should be initialized", () => ElementInjector.Received().Inject(null, ActualControllers[0]));
         Then("the Extensions should be detached", () => Extensions.ForEach(extension => extension.Received().Detach(ActualControllers[0], Element1)));
@@ -161,7 +161,7 @@ class ControllerCollectionSpec : FixtureSteppable
     {
         When("a controller is added", () => Controllers.Add(ActualControllers[0]));
         When("the controller is removed", () => Controllers.RemoveAt(0));
-        Then("the controller collection should not be unsubscribed events of the associated element", () => !Controllers.AssociatedElementEventsUnsubscribed);
+        Then("the controller collection should not be unsubscribed from events of the associated element", () => !Controllers.AssociatedElementEventsUnsubscribed);
         Then("the DataContext should not be initialized", () => DataContextInjector.DidNotReceive().Inject(Arg.Any<object?>(), Arg.Any<object>()));
         Then("the Element should not be initialized", () => ElementInjector.DidNotReceive().Inject(Arg.Any<TestElement?>(), Arg.Any<object>()));
         Then("the Extensions should not be detached", () => Extensions.ForEach(extension => extension.DidNotReceive().Detach(Arg.Any<object>(), Arg.Any<TestElement>())));
@@ -176,7 +176,7 @@ class ControllerCollectionSpec : FixtureSteppable
         ClearReceivedCalls();
 
         When("the controllers is cleared", () => Controllers.Clear());
-        Then("the controller collection should unsubscribe events of the associated element", () => Controllers.AssociatedElementEventsUnsubscribed);
+        Then("the controller collection should unsubscribe from events of the associated element", () => Controllers.AssociatedElementEventsUnsubscribed);
         Then("the DataContext should be initialized", () => ActualControllers.ForEach(controller => DataContextInjector.Received().Inject(null, controller)));
         Then("the Element should be initialized", () => ActualControllers.ForEach(controller => ElementInjector.Received().Inject(null, controller)));
         Then("the Extensions should be detached", () => Extensions.ForEach(extension => ActualControllers.ForEach(controller => extension.Received().Detach(controller, Element1))));
@@ -187,7 +187,7 @@ class ControllerCollectionSpec : FixtureSteppable
     {
         When("controllers are added", () => ActualControllers.ForEach(Controllers.Add));
         When("the controllers is cleared", () => Controllers.Clear());
-        Then("the controller collection should not unsubscribe events of the associated element", () => !Controllers.AssociatedElementEventsUnsubscribed);
+        Then("the controller collection should not unsubscribe from events of the associated element", () => !Controllers.AssociatedElementEventsUnsubscribed);
         Then("the DataContext should not be initialized", () => DataContextInjector.DidNotReceive().Inject(Arg.Any<object?>(), Arg.Any<object>()));
         Then("the Element should not be initialized", () => ElementInjector.DidNotReceive().Inject(Arg.Any<TestElement?>(), Arg.Any<object>()));
         Then("the Extensions should not be detached", () => Extensions.ForEach(extension => extension.DidNotReceive().Detach(Arg.Any<object>(), Arg.Any<TestElement>())));

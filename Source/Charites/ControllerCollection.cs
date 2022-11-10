@@ -121,13 +121,13 @@ public abstract class ControllerCollection<TElement> : Collection<object> where 
     protected abstract bool IsAssociatedElementLoaded(TElement associatedElement);
 
     /// <summary>
-    /// Subscribes events of the element to which controllers are attached.
+    /// Subscribes to events of the element to which controllers are attached.
     /// </summary>
     /// <param name="associatedElement">The element to which controllers are attached.</param>
     protected abstract void SubscribeAssociatedElementEvents(TElement associatedElement);
 
     /// <summary>
-    /// Unsubscribes events of the element to which controllers are attached.
+    /// Unsubscribes from events of the element to which controllers are attached.
     /// </summary>
     /// <param name="associatedElement">The element to which controllers are attached.</param>
     protected abstract void UnsubscribeAssociatedElementEvents(TElement associatedElement);
