@@ -4,14 +4,14 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>2.1.0</Version>
+    <Version>2.2.0</Version>
     <Authors>averrunci</Authors>
     <Company>averrunci</Company>
     <Copyright>Copyright (C) 2022 Fievus</Copyright>
     <NeutralLanguage>en-US</NeutralLanguage>
     <RootNamespace>Charites.Windows.Mvc</RootNamespace>
-    <AssemblyVersion>2.1.0</AssemblyVersion>
-    <FileVersion>2.1.0</FileVersion>
+    <AssemblyVersion>2.2.0</AssemblyVersion>
+    <FileVersion>2.2.0</FileVersion>
     <PackageId>Charites.Spec</PackageId>
     <Product>Charites.Spec</Product>
     <PackageProjectUrl>https://github.com/averrunci/Charites</PackageProjectUrl>
