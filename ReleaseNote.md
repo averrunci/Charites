@@ -5,22 +5,22 @@
 ### Add
 
 - Add the ObjectExtensions class that has the following extension methods.
-  - IfPresent&lt;T&gt;(this T?, Action&lt;T&gt;)
-  - IfPresent&lt;T1, T2&gt;(this T1?, T2?, Action&lt;T1, T2&gt;)
-  - IfPresent&lt;T1, T2, T3&gt;(this T1?, T2?, T3?, Action&lt;T1, T2, T3&gt;)
-  - IfPresent&lt;T1, T2, T3, T4&gt;(this T1?, T2?, T3?, T4?, Action&lt;T1, T2, T3, T4&gt;)
-  - IfPresent&lt;T1, T2, T3, T4, T5&gt;(this T1?, T2?, T3?, T4?, T5?, Action&lt;T1, T2, T3, T4, T5&gt;)
-  - IfPresent&lt;T1, T2, T3, T4, T5, T6&gt;(this T1?, T2?, T3?, T4?, T5?, T6?, Action&lt;T1, T2, T3, T4, T5, T6&gt;)
-  - IfPresent&lt;T1, T2, T3, T4, T5, T6, T7&gt;(this T1?, T2?, T3?, T4?, T5?, T6?, T7?, Action&lt;T1, T2, T3, T4, T5, T6, T7&gt;)
-  - IfPresent&lt;T1, T2, T3, T4, T5, T6, T7, T8&gt;(this T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, Action&lt;T1, T2, T3, T4, T5, T6, T7, T8&gt;)
-  - IfPresentAsync&lt;T&gt;(this T?, Action&lt;T, Task&gt;)
-  - IfPresentAsync&lt;T1, T2&gt;(this T1?, T2?, Func&lt;T1, T2, Task&gt;)
-  - IfPresentAsync&lt;T1, T2, T3&gt;(this T1?, T2?, T3?, Func&lt;T1, T2, T3, Task&gt;)
-  - IfPresentAsync&lt;T1, T2, T3, T4&gt;(this T1?, T2?, T3?, T4?, Func&lt;T1, T2, T3, T4, Task&gt;)
-  - IfPresentAsync&lt;T1, T2, T3, T4, T5&gt;(this T1?, T2?, T3?, T4?, T5?, Func&lt;T1, T2, T3, T4, T5, Task&gt;)
-  - IfPresentAsync&lt;T1, T2, T3, T4, T5, T6&gt;(this T1?, T2?, T3?, T4?, T5?, T6?, Func&lt;T1, T2, T3, T4, T5, T6, Task&gt;)
-  - IfPresentAsync&lt;T1, T2, T3, T4, T5, T6, T7&gt;(this T1?, T2?, T3?, T4?, T5?, T6?, T7?, Func&lt;T1, T2, T3, T4, T5, T6, T7, Task&gt;)
-  - IfPresentAsync&lt;T1, T2, T3, T4, T5, T6, T7, T8&gt;(this T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, Func&lt;T1, T2, T3, T4, T5, T6, T7, T8, Task&gt;)
+  - void IfPresent&lt;T&gt;(this T?, Action&lt;T&gt;)
+  - void IfPresent&lt;T1, T2&gt;(this T1?, T2?, Action&lt;T1, T2&gt;)
+  - void IfPresent&lt;T1, T2, T3&gt;(this T1?, T2?, T3?, Action&lt;T1, T2, T3&gt;)
+  - void IfPresent&lt;T1, T2, T3, T4&gt;(this T1?, T2?, T3?, T4?, Action&lt;T1, T2, T3, T4&gt;)
+  - void IfPresent&lt;T1, T2, T3, T4, T5&gt;(this T1?, T2?, T3?, T4?, T5?, Action&lt;T1, T2, T3, T4, T5&gt;)
+  - void IfPresent&lt;T1, T2, T3, T4, T5, T6&gt;(this T1?, T2?, T3?, T4?, T5?, T6?, Action&lt;T1, T2, T3, T4, T5, T6&gt;)
+  - void IfPresent&lt;T1, T2, T3, T4, T5, T6, T7&gt;(this T1?, T2?, T3?, T4?, T5?, T6?, T7?, Action&lt;T1, T2, T3, T4, T5, T6, T7&gt;)
+  - void IfPresent&lt;T1, T2, T3, T4, T5, T6, T7, T8&gt;(this T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, Action&lt;T1, T2, T3, T4, T5, T6, T7, T8&gt;)
+  - Task IfPresentAsync&lt;T&gt;(this T?, Action&lt;T, Task&gt;)
+  - Task IfPresentAsync&lt;T1, T2&gt;(this T1?, T2?, Func&lt;T1, T2, Task&gt;)
+  - Task IfPresentAsync&lt;T1, T2, T3&gt;(this T1?, T2?, T3?, Func&lt;T1, T2, T3, Task&gt;)
+  - Task IfPresentAsync&lt;T1, T2, T3, T4&gt;(this T1?, T2?, T3?, T4?, Func&lt;T1, T2, T3, T4, Task&gt;)
+  - Task IfPresentAsync&lt;T1, T2, T3, T4, T5&gt;(this T1?, T2?, T3?, T4?, T5?, Func&lt;T1, T2, T3, T4, T5, Task&gt;)
+  - Task IfPresentAsync&lt;T1, T2, T3, T4, T5, T6&gt;(this T1?, T2?, T3?, T4?, T5?, T6?, Func&lt;T1, T2, T3, T4, T5, T6, Task&gt;)
+  - Task IfPresentAsync&lt;T1, T2, T3, T4, T5, T6, T7&gt;(this T1?, T2?, T3?, T4?, T5?, T6?, T7?, Func&lt;T1, T2, T3, T4, T5, T6, T7, Task&gt;)
+  - Task IfPresentAsync&lt;T1, T2, T3, T4, T5, T6, T7, T8&gt;(this T1?, T2?, T3?, T4?, T5?, T6?, T7?, T8?, Func&lt;T1, T2, T3, T4, T5, T6, T7, T8, Task&gt;)
 - Add the ControllerBase class that represents a base class for a controller associated with a view that has a data context of the specified type.
 
 ## v2.1.0
