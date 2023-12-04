@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022 Fievus
+﻿// Copyright (C) 2022-2023 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -107,12 +107,12 @@ class EventHandlerActionSpec : FixtureSteppable
 
     MethodInfo GetMethodInfo(string name) => GetType().GetMethod(name, BindingFlags.NonPublic | BindingFlags.Instance) ?? throw new InvalidOperationException();
 
-    interface IDependency1 { }
-    interface IDependency2 { }
-    interface IDependency3 { }
-    class Dependency1Implementation : IDependency1 { }
-    class Dependency2Implementation : IDependency2 { }
-    class Dependency3Implementation : IDependency3 { }
+    interface IDependency1;
+    interface IDependency2;
+    interface IDependency3;
+    class Dependency1Implementation : IDependency1;
+    class Dependency2Implementation : IDependency2;
+    class Dependency3Implementation : IDependency3;
 
     public EventHandlerActionSpec()
     {

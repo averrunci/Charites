@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022 Fievus
+﻿// Copyright (C) 2022-2023 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -48,12 +48,12 @@ class EventHandlerBaseSpec : FixtureSteppable
     object Sender { get; } = new();
     object Args { get; } = new();
 
-    interface IDependency1 { }
-    interface IDependency2 { }
-    interface IDependency3 { }
-    class Dependency1Implementation : IDependency1 { }
-    class Dependency2Implementation : IDependency2 { }
-    class Dependency3Implementation : IDependency3 { }
+    interface IDependency1;
+    interface IDependency2;
+    interface IDependency3;
+    class Dependency1Implementation : IDependency1;
+    class Dependency2Implementation : IDependency2;
+    class Dependency3Implementation : IDependency3;
 
     IDependency1 Dependency1 { get; } = new Dependency1Implementation();
     IDependency2 Dependency2 { get; } = new Dependency2Implementation();

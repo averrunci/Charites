@@ -259,36 +259,23 @@ internal static class TestControllers
     }
 
     [View(Key = "TestElement1")]
-    public class TestElement1Controller
-    {
-
-    }
+    public class TestElement1Controller;
 
     [View(ViewType = typeof(TestElement))]
-    public class TestElementController
-    {
-    }
+    public class TestElementController;
 
     [View(ViewType = typeof(DerivedTestElement))]
-    public class DerivedTestElementController
-    {
-    }
+    public class DerivedTestElementController;
 
     [View(ViewType = typeof(DerivedTestElement), Key = "TestElement1")]
-    public class DerivedTestElement1Controller
-    {
-    }
+    public class DerivedTestElement1Controller;
 
     [View(Key = "TestElement1")]
     [View(ViewType = typeof(DerivedTestElement))]
-    public class ElementController
-    {
-    }
+    public class ElementController;
 
     [View]
-    public class ViewController
-    {
-    }
+    public class ViewController;
 
     public class EventHandlerAttributedToFieldController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
     {
@@ -571,12 +558,12 @@ internal static class TestControllers
         }
     }
 
-    public interface IDependency1 { }
-    public interface IDependency2 { }
-    public interface IDependency3 { }
-    public class Dependency1 : IDependency1 { }
-    public class Dependency2 : IDependency2 { }
-    public class Dependency3 : IDependency3 { }
+    public interface IDependency1;
+    public interface IDependency2;
+    public interface IDependency3;
+    public class Dependency1 : IDependency1;
+    public class Dependency2 : IDependency2;
+    public class Dependency3 : IDependency3;
 
     public class DisposableController : IDisposable
     {
@@ -588,44 +575,44 @@ internal static class TestControllers
         }
     }
 
-    public interface ITestDataContext { }
-    public interface ITestDataContextFullName { }
-    public class TestDataContext { }
-    public class TestDataContextFullName { }
-    public class BaseTestDataContext { }
-    public class DerivedBaseTestDataContext : BaseTestDataContext { }
-    public class BaseTestDataContextFullName { }
-    public class DerivedBaseTestDataContextFullName : BaseTestDataContextFullName { }
-    public class GenericTestDataContext<T> { }
-    public class GenericTestDataContextFullName<T> { }
-    public class InterfaceImplementedTestDataContext : ITestDataContext { }
-    public class InterfaceImplementedTestDataContextFullName : ITestDataContextFullName { }
-    public class KeyTestDataContext { }
+    public interface ITestDataContext;
+    public interface ITestDataContextFullName;
+    public class TestDataContext;
+    public class TestDataContextFullName;
+    public class BaseTestDataContext;
+    public class DerivedBaseTestDataContext : BaseTestDataContext;
+    public class BaseTestDataContextFullName;
+    public class DerivedBaseTestDataContextFullName : BaseTestDataContextFullName;
+    public class GenericTestDataContext<T>;
+    public class GenericTestDataContextFullName<T>;
+    public class InterfaceImplementedTestDataContext : ITestDataContext;
+    public class InterfaceImplementedTestDataContextFullName : ITestDataContextFullName;
+    public class KeyTestDataContext;
 
     [View(Key = "TestDataContext")]
-    public class TestDataContextController { }
+    public class TestDataContextController;
 
     [View(Key = "BaseTestDataContext")]
-    public class BaseTestDataContextController { }
+    public class BaseTestDataContextController;
 
     [View(Key = "Charites.Windows.Mvc.TestControllers+TestDataContextFullName")]
-    public class TestDataContextFullNameController { }
+    public class TestDataContextFullNameController;
 
     [View(Key = "Charites.Windows.Mvc.TestControllers+BaseTestDataContextFullName")]
-    public class BaseTestDataContextFullNameController { }
+    public class BaseTestDataContextFullNameController;
 
     [View(Key = "GenericTestDataContext`1")]
-    public class GenericTestDataContextController { }
+    public class GenericTestDataContextController;
 
     [View(Key = "Charites.Windows.Mvc.TestControllers+GenericTestDataContextFullName`1[System.String]")]
-    public class GenericTestDataContextFullNameController { }
+    public class GenericTestDataContextFullNameController;
 
     [View(Key = "Charites.Windows.Mvc.TestControllers+GenericTestDataContextFullName`1")]
-    public class GenericTestDataContextFullNameWithoutParametersController { }
+    public class GenericTestDataContextFullNameWithoutParametersController;
 
     [View(Key = "ITestDataContext")]
-    public class InterfaceImplementedTestDataContextController { }
+    public class InterfaceImplementedTestDataContextController;
 
     [View(Key = "Charites.Windows.Mvc.TestControllers+ITestDataContextFullName")]
-    public class InterfaceImplementedTestDataContextFullNameController { }
+    public class InterfaceImplementedTestDataContextFullNameController;
 }
