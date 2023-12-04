@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022 Fievus
+﻿// Copyright (C) 2022-2023 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -290,405 +290,284 @@ internal static class TestControllers
     {
     }
 
-    public class EventHandlerAttributedToFieldController
+    public class EventHandlerAttributedToFieldController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
     {
         [EventHandler(ElementName = "Element1", Event = "Click")]
-        private readonly Action noArgumentHandler;
+        private readonly Action noArgumentHandler = noArgumentAssertionHandler;
 
         [EventHandler(ElementName = "Element1", Event = "Click")]
         [EventHandler(ElementName = "Element2", Event = "Click")]
-        private readonly Action<object> oneArgumentHandler;
+        private readonly Action<object> oneArgumentHandler = oneArgumentAssertionHandler;
 
         [EventHandler(ElementName = "Element1", Event = "Click")]
         [EventHandler(ElementName = "Element2", Event = "Click")]
         [EventHandler(ElementName = "Element3", Event = "Click")]
-        private readonly Action<object, object> twoArgumentsHandler;
-
-        public EventHandlerAttributedToFieldController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
-        {
-            noArgumentHandler = noArgumentAssertionHandler;
-            oneArgumentHandler = oneArgumentAssertionHandler;
-            twoArgumentsHandler = twoArgumentsAssertionHandler;
-        }
+        private readonly Action<object, object> twoArgumentsHandler = twoArgumentsAssertionHandler;
     }
 
-    public class EventHandlerNotAttributedToFieldController
+    public class EventHandlerNotAttributedToFieldController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
     {
-        private readonly Action noArgumentHandler;
-        private readonly Action<object> oneArgumentHandler;
-        private readonly Action<object, object> twoArgumentsHandler;
-
-        public EventHandlerNotAttributedToFieldController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
-        {
-            noArgumentHandler = noArgumentAssertionHandler;
-            oneArgumentHandler = oneArgumentAssertionHandler;
-            twoArgumentsHandler = twoArgumentsAssertionHandler;
-        }
+        private readonly Action noArgumentHandler = noArgumentAssertionHandler;
+        private readonly Action<object> oneArgumentHandler = oneArgumentAssertionHandler;
+        private readonly Action<object, object> twoArgumentsHandler = twoArgumentsAssertionHandler;
     }
 
-    public class EventHandlerAttributedToPropertyController
+    public class EventHandlerAttributedToPropertyController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
     {
         [EventHandler(ElementName = "Element1", Event = "Click")]
-        public Action NoArgumentHandler { get; set; }
+        public Action NoArgumentHandler { get; set; } = noArgumentAssertionHandler;
 
         [EventHandler(ElementName = "Element1", Event = "Click")]
         [EventHandler(ElementName = "Element2", Event = "Click")]
-        private Action<object> OneArgumentHandler { get; set; }
+        private Action<object> OneArgumentHandler { get; set; } = oneArgumentAssertionHandler;
 
         [EventHandler(ElementName = "Element1", Event = "Click")]
         [EventHandler(ElementName = "Element2", Event = "Click")]
         [EventHandler(ElementName = "Element3", Event = "Click")]
-        private Action<object, object> TwoArgumentsHandler { get; set; }
-
-        public EventHandlerAttributedToPropertyController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
-        {
-            NoArgumentHandler = noArgumentAssertionHandler;
-            OneArgumentHandler = oneArgumentAssertionHandler;
-            TwoArgumentsHandler = twoArgumentsAssertionHandler;
-        }
+        private Action<object, object> TwoArgumentsHandler { get; set; } = twoArgumentsAssertionHandler;
     }
 
-    public class EventHandlerNotAttributedToPropertyController
+    public class EventHandlerNotAttributedToPropertyController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
     {
-        public Action NoArgumentHandler { get; set; }
-        private Action<object> OneArgumentHandler { get; set; }
-        private Action<object, object> TwoArgumentsHandler { get; set; }
-
-        public EventHandlerNotAttributedToPropertyController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
-        {
-            NoArgumentHandler = noArgumentAssertionHandler;
-            OneArgumentHandler = oneArgumentAssertionHandler;
-            TwoArgumentsHandler = twoArgumentsAssertionHandler;
-        }
+        public Action NoArgumentHandler { get; set; } = noArgumentAssertionHandler;
+        private Action<object> OneArgumentHandler { get; set; } = oneArgumentAssertionHandler;
+        private Action<object, object> TwoArgumentsHandler { get; set; } = twoArgumentsAssertionHandler;
     }
 
-    public class EventHandlerAttributedToWriteOnlyPropertyController
+    public class EventHandlerAttributedToWriteOnlyPropertyController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
     {
         [EventHandler(ElementName = "Element1", Event = "Click")]
-        public Action NoArgumentHandler { set => noArgumentHandler = value; }
-        private Action noArgumentHandler;
+        public Action NoArgumentHandler { set => noArgumentAssertionHandler = value; }
 
         [EventHandler(ElementName = "Element1", Event = "Click")]
         [EventHandler(ElementName = "Element2", Event = "Click")]
-        private Action<object> OneArgumentHandler { set => oneArgumentHandler = value; }
-        private Action<object> oneArgumentHandler;
+        private Action<object> OneArgumentHandler { set => oneArgumentAssertionHandler = value; }
 
         [EventHandler(ElementName = "Element1", Event = "Click")]
         [EventHandler(ElementName = "Element2", Event = "Click")]
         [EventHandler(ElementName = "Element3", Event = "Click")]
-        private Action<object, object> TwoArgumentsHandler { set => twoArgumentsHandler = value; }
-        private Action<object, object> twoArgumentsHandler;
-
-        public EventHandlerAttributedToWriteOnlyPropertyController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
-        {
-            noArgumentHandler = noArgumentAssertionHandler;
-            oneArgumentHandler = oneArgumentAssertionHandler;
-            twoArgumentsHandler = twoArgumentsAssertionHandler;
-        }
+        private Action<object, object> TwoArgumentsHandler { set => twoArgumentsAssertionHandler = value; }
     }
 
-    public class EventHandlerAttributedToMethodController
+    public class EventHandlerAttributedToMethodController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
     {
         [EventHandler(ElementName = "Element1", Event = "Click")]
         public void HandleNoArgument()
         {
-            noArgumentHandler();
+            noArgumentAssertionHandler();
         }
-        private readonly Action noArgumentHandler;
 
         [EventHandler(ElementName = "Element1", Event = "Click")]
         [EventHandler(ElementName = "Element2", Event = "Click")]
         private void HandleOneArgument(object e)
         {
-            oneArgumentHandler(e);
+            oneArgumentAssertionHandler(e);
         }
-        private readonly Action<object> oneArgumentHandler;
 
         [EventHandler(ElementName = "Element1", Event = "Click")]
         [EventHandler(ElementName = "Element2", Event = "Click")]
         [EventHandler(ElementName = "Element3", Event = "Click")]
         private void HandleTwoArguments(object sender, object e)
         {
-            twoArgumentsHandler(sender, e);
-        }
-        private readonly Action<object, object> twoArgumentsHandler;
-
-        public EventHandlerAttributedToMethodController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
-        {
-            noArgumentHandler = noArgumentAssertionHandler;
-            oneArgumentHandler = oneArgumentAssertionHandler;
-            twoArgumentsHandler = twoArgumentsAssertionHandler;
+            twoArgumentsAssertionHandler(sender, e);
         }
     }
 
-    public class EventHandlerNotAttributedToMethodController
+    public class EventHandlerNotAttributedToMethodController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
     {
         public void HandleNoArgument()
         {
-            noArgumentHandler();
+            noArgumentAssertionHandler();
         }
-        private readonly Action noArgumentHandler;
 
         private void HandleOneArgument(object e)
         {
-            oneArgumentHandler(e);
+            oneArgumentAssertionHandler(e);
         }
-        private readonly Action<object> oneArgumentHandler;
 
         private void HandleTwoArguments(object sender, object e)
         {
-            twoArgumentsHandler(sender, e);
-        }
-        private readonly Action<object, object> twoArgumentsHandler;
-
-        public EventHandlerNotAttributedToMethodController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
-        {
-            noArgumentHandler = noArgumentAssertionHandler;
-            oneArgumentHandler = oneArgumentAssertionHandler;
-            twoArgumentsHandler = twoArgumentsAssertionHandler;
+            twoArgumentsAssertionHandler(sender, e);
         }
     }
 
-    public class EventHandlerAttributedToWrongArgumentMethodController
+    public class EventHandlerAttributedToWrongArgumentMethodController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
     {
         [EventHandler(ElementName = "Element1", Event = "Click")]
         public void HandleNoArgument(object parameter1, object parameter2, object parameter3)
         {
-            noArgumentHandler();
+            noArgumentAssertionHandler();
         }
-        private readonly Action noArgumentHandler;
 
         [EventHandler(ElementName = "Element1", Event = "Click")]
         [EventHandler(ElementName = "Element2", Event = "Click")]
         private void HandleOneArgument(object e)
         {
-            oneArgumentHandler(e);
+            oneArgumentAssertionHandler(e);
         }
-        private readonly Action<object> oneArgumentHandler;
 
         [EventHandler(ElementName = "Element1", Event = "Click")]
         [EventHandler(ElementName = "Element2", Event = "Click")]
         [EventHandler(ElementName = "Element3", Event = "Click")]
         private void HandleTwoArguments(object sender, object e)
         {
-            twoArgumentsHandler(sender, e);
-        }
-        private readonly Action<object, object> twoArgumentsHandler;
-
-        public EventHandlerAttributedToWrongArgumentMethodController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
-        {
-            noArgumentHandler = noArgumentAssertionHandler;
-            oneArgumentHandler = oneArgumentAssertionHandler;
-            twoArgumentsHandler = twoArgumentsAssertionHandler;
+            twoArgumentsAssertionHandler(sender, e);
         }
     }
 
-    public class EventHandlerOfMethodUsingNamingConventionController
+    public class EventHandlerOfMethodUsingNamingConventionController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
     {
         public void Element1_Click()
         {
-            noArgumentHandler();
+            noArgumentAssertionHandler();
         }
-        private readonly Action noArgumentHandler;
 
         private void Element1_Click(object e)
         {
-            oneArgumentHandler(e);
+            oneArgumentAssertionHandler(e);
         }
         private void Element2_Click(object e)
         {
-            oneArgumentHandler(e);
+            oneArgumentAssertionHandler(e);
         }
-        private readonly Action<object> oneArgumentHandler;
 
         private void Element1_Click(object sender, object e)
         {
-            twoArgumentsHandler(sender, e);
+            twoArgumentsAssertionHandler(sender, e);
         }
         private void Element2_Click(object sender, object e)
         {
-            twoArgumentsHandler(sender, e);
+            twoArgumentsAssertionHandler(sender, e);
         }
         private void Element3_Click(object sender, object e)
         {
-            twoArgumentsHandler(sender, e);
-        }
-        private readonly Action<object, object> twoArgumentsHandler;
-
-        public EventHandlerOfMethodUsingNamingConventionController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
-        {
-            noArgumentHandler = noArgumentAssertionHandler;
-            oneArgumentHandler = oneArgumentAssertionHandler;
-            twoArgumentsHandler = twoArgumentsAssertionHandler;
+            twoArgumentsAssertionHandler(sender, e);
         }
     }
 
-    public class EventHandlerOfAsyncMethodUsingNamingConventionController
+    public class EventHandlerOfAsyncMethodUsingNamingConventionController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
     {
         public Task Element1_ClickAsync()
         {
-            noArgumentHandler();
+            noArgumentAssertionHandler();
             return Task.CompletedTask;
         }
-        private readonly Action noArgumentHandler;
 
         private Task Element1_ClickAsync(object e)
         {
-            oneArgumentHandler(e);
+            oneArgumentAssertionHandler(e);
             return Task.CompletedTask;
         }
         private Task Element2_ClickAsync(object e)
         {
-            oneArgumentHandler(e);
+            oneArgumentAssertionHandler(e);
             return Task.CompletedTask;
         }
-        private readonly Action<object> oneArgumentHandler;
 
         private Task Element1_ClickAsync(object sender, object e)
         {
-            twoArgumentsHandler(sender, e);
+            twoArgumentsAssertionHandler(sender, e);
             return Task.CompletedTask;
         }
         private Task Element2_ClickAsync(object sender, object e)
         {
-            twoArgumentsHandler(sender, e);
+            twoArgumentsAssertionHandler(sender, e);
             return Task.CompletedTask;
         }
         private Task Element3_ClickAsync(object sender, object e)
         {
-            twoArgumentsHandler(sender, e);
+            twoArgumentsAssertionHandler(sender, e);
             return Task.CompletedTask;
-        }
-        private readonly Action<object, object> twoArgumentsHandler;
-
-        public EventHandlerOfAsyncMethodUsingNamingConventionController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
-        {
-            noArgumentHandler = noArgumentAssertionHandler;
-            oneArgumentHandler = oneArgumentAssertionHandler;
-            twoArgumentsHandler = twoArgumentsAssertionHandler;
         }
     }
 
-    public class EventHandlerOfMethodUsingWrongNamingConventionController
+    public class EventHandlerOfMethodUsingWrongNamingConventionController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
     {
         public void _Element1Click()
         {
-            noArgumentHandler();
+            noArgumentAssertionHandler();
         }
-        private readonly Action noArgumentHandler;
 
         private void Element2_Click_(object e)
         {
-            oneArgumentHandler(e);
+            oneArgumentAssertionHandler(e);
         }
-        private readonly Action<object> oneArgumentHandler;
 
         private void OnElement3Click(object sender, object e)
         {
-            twoArgumentsHandler(sender, e);
-        }
-        private readonly Action<object, object> twoArgumentsHandler;
-
-        public EventHandlerOfMethodUsingWrongNamingConventionController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
-        {
-            noArgumentHandler = noArgumentAssertionHandler;
-            oneArgumentHandler = oneArgumentAssertionHandler;
-            twoArgumentsHandler = twoArgumentsAssertionHandler;
+            twoArgumentsAssertionHandler(sender, e);
         }
     }
 
-    public class EventHandlerOfWrongArgumentMethodUsingNamingConventionController
+    public class EventHandlerOfWrongArgumentMethodUsingNamingConventionController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
     {
         public void Element1_Click(object parameter1, object parameter2, object parameter3)
         {
-            noArgumentHandler();
+            noArgumentAssertionHandler();
         }
-        private readonly Action noArgumentHandler;
 
         private void Element1_Click(object e)
         {
-            oneArgumentHandler(e);
+            oneArgumentAssertionHandler(e);
         }
         private void Element2_Click(object e)
         {
-            oneArgumentHandler(e);
+            oneArgumentAssertionHandler(e);
         }
-        private readonly Action<object> oneArgumentHandler;
 
         private void Element1_Click(object sender, object e)
         {
-            twoArgumentsHandler(sender, e);
+            twoArgumentsAssertionHandler(sender, e);
         }
         private void Element2_Click(object sender, object e)
         {
-            twoArgumentsHandler(sender, e);
+            twoArgumentsAssertionHandler(sender, e);
         }
         private void Element3_Click(object sender, object e)
         {
-            twoArgumentsHandler(sender, e);
-        }
-        private readonly Action<object, object> twoArgumentsHandler;
-
-        public EventHandlerOfWrongArgumentMethodUsingNamingConventionController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler)
-        {
-            noArgumentHandler = noArgumentAssertionHandler;
-            oneArgumentHandler = oneArgumentAssertionHandler;
-            twoArgumentsHandler = twoArgumentsAssertionHandler;
+            twoArgumentsAssertionHandler(sender, e);
         }
     }
 
-    public class EventHandlerOfMethodWithParametersSpecifiedByAttributeController
+    public class EventHandlerOfMethodWithParametersSpecifiedByAttributeController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler, Action<IDependency1, IDependency2, IDependency3, TestElement, TestDataContext> attributedArgumentsAssertionHandler)
     {
         [EventHandler(ElementName = "Element1", Event = "Click")]
         public void OnElement1Click([FromDI] IDependency1 dependency1, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3, [FromElement] TestElement element, [FromDataContext] TestDataContext dataContext)
         {
-            noArgumentHandler();
-            attributedArgumentsHandler(dependency1, dependency2, dependency3, element, dataContext);
+            noArgumentAssertionHandler();
+            attributedArgumentsAssertionHandler(dependency1, dependency2, dependency3, element, dataContext);
         }
         public async Task Element4_Click([FromDI] IDependency1 dependency1, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3, [FromElement] TestElement element, [FromDataContext] TestDataContext dataContext)
         {
             await Task.Delay(10);
-            noArgumentHandler();
-            attributedArgumentsHandler(dependency1, dependency2, dependency3, element, dataContext);
+            noArgumentAssertionHandler();
+            attributedArgumentsAssertionHandler(dependency1, dependency2, dependency3, element, dataContext);
         }
-        private readonly Action noArgumentHandler;
 
         private void Element2_Click([FromDI] IDependency1 dependency1, object e, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3, [FromElement] TestElement element, [FromDataContext] TestDataContext dataContext)
         {
-            oneArgumentHandler(e);
-            attributedArgumentsHandler(dependency1, dependency2, dependency3, element, dataContext);
+            oneArgumentAssertionHandler(e);
+            attributedArgumentsAssertionHandler(dependency1, dependency2, dependency3, element, dataContext);
         }
         [EventHandler(ElementName = "Element5", Event = "Click")]
         private async Task OnElement5Click([FromDI] IDependency1 dependency1, object e, [FromDI] IDependency2 dependency2, [FromDI] IDependency3 dependency3, [FromElement] TestElement element, [FromDataContext] TestDataContext dataContext)
         {
             await Task.Delay(10);
-            oneArgumentHandler(e);
-            attributedArgumentsHandler(dependency1, dependency2, dependency3, element, dataContext);
+            oneArgumentAssertionHandler(e);
+            attributedArgumentsAssertionHandler(dependency1, dependency2, dependency3, element, dataContext);
         }
-        private readonly Action<object> oneArgumentHandler;
 
         [EventHandler(ElementName = "Element3", Event = "Click")]
         private void OnElement3Click([FromDI] IDependency1 dependency1, object sender, [FromDI] IDependency2 dependency2, object e, [FromDI] IDependency3 dependency3, [FromElement] TestElement element, [FromDataContext] TestDataContext dataContext)
         {
-            twoArgumentsHandler(sender, e);
-            attributedArgumentsHandler(dependency1, dependency2, dependency3, element, dataContext);
+            twoArgumentsAssertionHandler(sender, e);
+            attributedArgumentsAssertionHandler(dependency1, dependency2, dependency3, element, dataContext);
         }
         private async Task Element6_Click([FromDI] IDependency1 dependency1, object sender, [FromDI] IDependency2 dependency2, object e, [FromDI] IDependency3 dependency3, [FromElement] TestElement element, [FromDataContext] TestDataContext dataContext)
         {
             await Task.Delay(10);
-            twoArgumentsHandler(sender, e);
-            attributedArgumentsHandler(dependency1, dependency2, dependency3, element, dataContext);
-        }
-        private readonly Action<object, object> twoArgumentsHandler;
-
-        private readonly Action<IDependency1, IDependency2, IDependency3, TestElement, TestDataContext> attributedArgumentsHandler;
-
-        public EventHandlerOfMethodWithParametersSpecifiedByAttributeController(Action noArgumentAssertionHandler, Action<object> oneArgumentAssertionHandler, Action<object, object> twoArgumentsAssertionHandler, Action<IDependency1, IDependency2, IDependency3, TestElement, TestDataContext> attributedArgumentsAssertionHandler)
-        {
-            noArgumentHandler = noArgumentAssertionHandler;
-            oneArgumentHandler = oneArgumentAssertionHandler;
-            twoArgumentsHandler = twoArgumentsAssertionHandler;
-            attributedArgumentsHandler = attributedArgumentsAssertionHandler;
+            twoArgumentsAssertionHandler(sender, e);
+            attributedArgumentsAssertionHandler(dependency1, dependency2, dependency3, element, dataContext);
         }
     }
 
