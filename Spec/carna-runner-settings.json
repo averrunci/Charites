@@ -1,6 +1,6 @@
 ﻿{
   "assemblies": [
-    "Charites.Spec\\bin\\Debug\\net6.0\\Charites.Spec.dll"
+    "Charites.Spec\\bin\\Debug\\net8.0\\Charites.Spec.dll"
   ],
   "reporters": [
     {
