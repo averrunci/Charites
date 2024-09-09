@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022-2023 Fievus
+﻿// Copyright (C) 2022-2024 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -49,6 +49,31 @@ class EventHandlerExtensionSpec : FixtureSteppable
         object? IEventHandlerParameterResolver.Resolve(ParameterInfo parameter) => null;
     }
     interface ITestEventHandlerParameterResolver : IEventHandlerParameterResolver;
+    
+    class EventHandlerOrderTestHandler : TestControllers.IEventHandlerOrderHandler
+    {
+        private readonly List<Type> fieldHandlerInvokedTypes = [];
+        private readonly List<Type> propertyHandlerInvokedTypes = [];
+        private readonly List<Type> methodHandlerInvokedTypes = [];
+        private readonly List<Type> namingConventionMethodHandlerInvokedTypes = [];
+
+        private readonly IEnumerable<Type> expectedInvokedTypes =
+        [
+            typeof(TestControllers.EventHandlerOrderTestController1),
+            typeof(TestControllers.EventHandlerOrderTestController2),
+            typeof(TestControllers.EventHandlerOrderTestController3)
+        ]; 
+
+        public void Handle1(Type type) => fieldHandlerInvokedTypes.Add(type);
+        public void Handle2(Type type) => propertyHandlerInvokedTypes.Add(type);
+        public void Handle3(Type type) => methodHandlerInvokedTypes.Add(type);
+        public void Handle4(Type type) => namingConventionMethodHandlerInvokedTypes.Add(type);
+
+        public bool AssertHandler1() => fieldHandlerInvokedTypes.SequenceEqual(expectedInvokedTypes);
+        public bool AssertHandler2() => propertyHandlerInvokedTypes.SequenceEqual(expectedInvokedTypes);
+        public bool AssertHandler3() => methodHandlerInvokedTypes.SequenceEqual(expectedInvokedTypes);
+        public bool AssertHandler4() => namingConventionMethodHandlerInvokedTypes.SequenceEqual(expectedInvokedTypes);
+    }
 
     public EventHandlerExtensionSpec()
     {
@@ -549,5 +574,25 @@ class EventHandlerExtensionSpec : FixtureSteppable
             ((EventHandlerExtensionTss)EventHandlerExtension).Remove(typeof(TestEventHandlerParameterResolver3));
         });
         Then("the specified resolvers should be removed", () => ((EventHandlerExtensionTss)EventHandlerExtension).AssertParameterResolverTypes());
+    }
+    
+    [Example("When event handlers are declared in base types")]
+    void Ex15()
+    {
+        var handler = new EventHandlerOrderTestHandler();
+        Given("a controller that has event handlers in base types", () => Controller = new TestControllers.EventHandlerOrderTestController3(handler));
+        When("the controller is attached", () => EventHandlerExtension.Attach(Controller, RootElement));
+        When("the EventHandlerBase is retrieved", () => EventHandlerBase = (EventHandlerBase<TestElement, EventHandlerItemTss>)EventHandlerExtension.Retrieve(Controller));
+
+        When("the event handled handlers s raised", () =>
+        {
+            EventHandlerBase.GetBy("Element1").Raise("Click");
+            EventHandlerBase.GetBy("Element2").Raise("Click");
+            EventHandlerBase.GetBy("Element3").Raise("Click");
+            EventHandlerBase.GetBy("Element4").Raise("Click");
+        });
+        Then("the event should be handled according to the proper order", () =>
+            handler.AssertHandler1() && handler.AssertHandler2() && handler.AssertHandler3() && handler.AssertHandler4()
+        );
     }
 }

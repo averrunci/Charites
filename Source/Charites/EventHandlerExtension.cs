@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022 Fievus
+﻿// Copyright (C) 2022-2024 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -17,7 +17,7 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
     /// <summary>
     /// Gets the <see cref="BindingFlags"/> for an event handler.
     /// </summary>
-    protected virtual BindingFlags EventHandlerBindingFlags => BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
+    protected virtual BindingFlags EventHandlerBindingFlags => BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
 
     /// <summary>
     /// Gets the resolver to resolve parameters of an event handler.
@@ -141,27 +141,63 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
     protected virtual EventHandlerBase<TElement, TItem> RetrieveEventHandlers(object controller, TElement? element)
     {
         var eventHandlerBases = EnsureEventHandlerBases(element);
-        if (eventHandlerBases.ContainsKey(controller)) return eventHandlerBases[controller];
+        if (eventHandlerBases.TryGetValue(controller, out var handlers)) return handlers;
 
         var eventHandlers = new EventHandlerBase<TElement, TItem>();
         eventHandlerBases[controller] = eventHandlers;
 
-        RetrieveEventHandlersFromField(controller, element, eventHandlers);
-        RetrieveEventHandlersFromProperty(controller, element, eventHandlers);
-        RetrieveEventHandlersFromMethod(controller, element, eventHandlers);
-        RetrieveEventHandlersFromMethodUsingNamingConvention(controller, element, eventHandlers);
+        RetrieveEventHandlers(controller, element, eventHandlers);
 
         return eventHandlers;
     }
 
+    /// <summary>
+    /// Retrieves event handlers from the specified controller.
+    /// </summary>
+    /// <param name="controller">The controller in which event handlers are defined.</param>
+    /// <param name="element">The element that raises the event.</param>
+    /// <param name="eventHandlers">The <see cref="EventHandlerBase{TElement,TItem}"/> to add retrieved event handlers.</param>
+    protected virtual void RetrieveEventHandlers(object controller, TElement? element, EventHandlerBase<TElement, TItem> eventHandlers)
+    {
+        foreach (var controllerType in GetControllerTypeHierarchy(controller))
+        {
+            RetrieveEventHandlersFromField(controllerType, controller, element, eventHandlers);
+            RetrieveEventHandlersFromProperty(controllerType, controller, element, eventHandlers);
+            RetrieveEventHandlersFromMethod(controllerType, controller, element, eventHandlers);
+            RetrieveEventHandlersFromMethodUsingNamingConvention(controllerType, controller, element, eventHandlers);
+        }
+    }
+
+    private IEnumerable<Type> GetControllerTypeHierarchy(object controller)
+    {
+        var controllerTypeHierarchy = new List<Type>();
+        for (var controllerType = controller.GetType(); controllerType is not null; controllerType = controllerType.BaseType)
+        {
+            controllerTypeHierarchy.Add(controllerType);
+        }
+        controllerTypeHierarchy.Reverse();
+        return controllerTypeHierarchy;
+    }
+    
     /// <summary>
     /// Retrieves event handlers from fields that are defined in the specified controller.
     /// </summary>
     /// <param name="controller">The controller in which event handlers are defined.</param>
     /// <param name="element">The element that raises the event.</param>
     /// <param name="eventHandlers">The <see cref="EventHandlerBase{TElement,TItem}"/> to add retrieved event handlers.</param>
+    [Obsolete("This method is obsolete. Use the RetrieveEventHandlersFromField(Type, object, TElement?, EventHandlerBase<TElement, TItem>) instead.")]
     protected virtual void RetrieveEventHandlersFromField(object controller, TElement? element, EventHandlerBase<TElement, TItem> eventHandlers)
-        => controller.GetType()
+        => RetrieveEventHandlersFromField(controller.GetType(), controller, element, eventHandlers);
+
+    /// <summary>
+    /// Retrieves event handlers from fields that are defined in the specified controller.
+    /// </summary>
+    /// <param name="controllerType">Tye type of the controller.</param>
+    /// <param name="controller">The controller in which event handlers are defined.</param>
+    /// <param name="element">The element that raises the event.</param>
+    /// <param name="eventHandlers">The <see cref="EventHandlerBase{TElement,TItem}"/> to add retrieved event handlers.</param>
+    protected virtual void RetrieveEventHandlersFromField(Type controllerType, object controller, TElement? element, EventHandlerBase<TElement, TItem> eventHandlers)
+        => controllerType
             .GetFields(EventHandlerBindingFlags)
             .Where(field => field.GetCustomAttributes<EventHandlerAttribute>(true).Any())
             .ForEach(field => AddEventHandlers(field, element, handlerType => CreateEventHandler(field.GetValue(controller) as Delegate, handlerType, element), eventHandlers));
@@ -172,8 +208,19 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
     /// <param name="controller">The controller in which event handlers are defined.</param>
     /// <param name="element">The element that raises the event.</param>
     /// <param name="eventHandlers">The <see cref="EventHandlerBase{TElement,TItem}"/> to add retrieved event handlers.</param>
+    [Obsolete("This method is obsolete. Use the RetrieveEventHandlersFromProperty(Type, object, TElement?, EventHandlerBase<TElement, TItem>) instead.")]
     protected virtual void RetrieveEventHandlersFromProperty(object controller, TElement? element, EventHandlerBase<TElement, TItem> eventHandlers)
-        => controller.GetType()
+        => RetrieveEventHandlersFromProperty(controller.GetType(), controller, element, eventHandlers);
+    
+    /// <summary>
+    /// Retrieves event handlers from properties that are defined in the specified controller.
+    /// </summary>
+    /// <param name="controllerType">Tye type of the controller.</param>
+    /// <param name="controller">The controller in which event handlers are defined.</param>
+    /// <param name="element">The element that raises the event.</param>
+    /// <param name="eventHandlers">The <see cref="EventHandlerBase{TElement,TItem}"/> to add retrieved event handlers.</param>
+    protected virtual void RetrieveEventHandlersFromProperty(Type controllerType, object controller, TElement? element, EventHandlerBase<TElement, TItem> eventHandlers)
+        => controllerType
             .GetProperties(EventHandlerBindingFlags)
             .Where(property => property.GetCustomAttributes<EventHandlerAttribute>(true).Any())
             .Where(property => property.CanRead)
@@ -185,8 +232,19 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
     /// <param name="controller">The controller in which event handlers are defined.</param>
     /// <param name="element">The element that raises the event.</param>
     /// <param name="eventHandlers">The <see cref="EventHandlerBase{TElement,TItem}"/> to add retrieved event handlers.</param>
+    [Obsolete("This method is obsolete. Use the RetrieveEventHandlersFromMethod(Type, object, TElement?, EventHandlerBase<TElement, TItem>) instead.")]
     protected virtual void RetrieveEventHandlersFromMethod(object controller, TElement? element, EventHandlerBase<TElement, TItem> eventHandlers)
-        => controller.GetType()
+        => RetrieveEventHandlersFromMethod(controller.GetType(), controller, element, eventHandlers);
+
+    /// <summary>
+    /// Retrieves event handlers from methods that are defined in the specified controller.
+    /// </summary>
+    /// <param name="controllerType">Tye type of the controller.</param>
+    /// <param name="controller">The controller in which event handlers are defined.</param>
+    /// <param name="element">The element that raises the event.</param>
+    /// <param name="eventHandlers">The <see cref="EventHandlerBase{TElement,TItem}"/> to add retrieved event handlers.</param>
+    protected virtual void RetrieveEventHandlersFromMethod(Type controllerType, object controller, TElement? element, EventHandlerBase<TElement, TItem> eventHandlers)
+        => controllerType
             .GetMethods(EventHandlerBindingFlags)
             .Where(method => method.GetCustomAttributes<EventHandlerAttribute>(true).Any())
             .ForEach(method => AddEventHandlers(method, element, handlerType => CreateEventHandler(method, controller, handlerType, element), eventHandlers));
@@ -197,8 +255,19 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
     /// <param name="controller">The controller in which event handlers are defined using a naming convention (ElementName_EventName).</param>
     /// <param name="element">The element that raises the event.</param>
     /// <param name="eventHandlers">The <see cref="EventHandlerBase{TElement,TItem}"/> to add retrieved event handlers.</param>
+    [Obsolete("This method is obsolete. Use the RetrieveEventHandlersFromMethodUsingNamingConvention(Type, object, TElement?, EventHandlerBase<TElement, TItem>) instead.")]
     protected virtual void RetrieveEventHandlersFromMethodUsingNamingConvention(object controller, TElement? element, EventHandlerBase<TElement, TItem> eventHandlers)
-        => controller.GetType()
+        => RetrieveEventHandlersFromMethodUsingNamingConvention(controller.GetType(), controller, element, eventHandlers);
+    
+    /// <summary>
+    /// Retrieves event handlers from methods that are defined in the specified controller.
+    /// </summary>
+    /// <param name="controllerType">Tye type of the controller.</param>
+    /// <param name="controller">The controller in which event handlers are defined using a naming convention (ElementName_EventName).</param>
+    /// <param name="element">The element that raises the event.</param>
+    /// <param name="eventHandlers">The <see cref="EventHandlerBase{TElement,TItem}"/> to add retrieved event handlers.</param>
+    protected virtual void RetrieveEventHandlersFromMethodUsingNamingConvention(Type controllerType, object controller, TElement? element, EventHandlerBase<TElement, TItem> eventHandlers)
+        => controllerType
             .GetMethods(EventHandlerBindingFlags)
             .Where(FilterMethodUsingNamingConvention)
             .Select(method =>

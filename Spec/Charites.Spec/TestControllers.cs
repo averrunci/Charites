@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022-2023 Fievus
+﻿// Copyright (C) 2022-2024 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -556,6 +556,60 @@ internal static class TestControllers
             twoArgumentsAssertionHandler(sender, e);
             attributedArgumentsAssertionHandler(dependency1, dependency2, dependency3, element, dataContext);
         }
+    }
+
+    public class EventHandlerOrderTestController1(IEventHandlerOrderHandler handler)
+    {
+        [EventHandler(ElementName = "Element1", Event = "Click")]
+        protected readonly Action FieldHandler1 = () => handler.Handle1(typeof(EventHandlerOrderTestController1));
+
+        [EventHandler(ElementName = "Element2", Event = "Click")]
+        protected Action PropertyHandler2 { get; set; } = () => handler.Handle2(typeof(EventHandlerOrderTestController1));
+
+        [EventHandler(ElementName = "Element3", Event = "Click")]
+        protected void HandleWithMethod3() => handler.Handle3(typeof(EventHandlerOrderTestController1));
+        
+        protected void Element4_Click() => handler.Handle4(typeof(EventHandlerOrderTestController1));
+    }
+    
+    public class EventHandlerOrderTestController2(IEventHandlerOrderHandler handler) : EventHandlerOrderTestController1(handler)
+    {
+        [EventHandler(ElementName = "Element2", Event = "Click")]
+        protected readonly Action FieldHandler2 = () => handler.Handle2(typeof(EventHandlerOrderTestController2));
+
+        [EventHandler(ElementName = "Element3", Event = "Click")]
+        protected Action PropertyHandler3 { get; set; } = () => handler.Handle3(typeof(EventHandlerOrderTestController2));
+
+        [EventHandler(ElementName = "Element4", Event = "Click")]
+        protected void HandleWithMethod4() => handler.Handle4(typeof(EventHandlerOrderTestController2));
+        
+        protected void Element1_Click() => handler.Handle1(typeof(EventHandlerOrderTestController2));
+
+        private readonly IEventHandlerOrderHandler handler = handler;
+    }
+    
+    public class EventHandlerOrderTestController3(IEventHandlerOrderHandler handler) : EventHandlerOrderTestController2(handler)
+    {
+        [EventHandler(ElementName = "Element3", Event = "Click")]
+        private readonly Action fieldHandler3 = () => handler.Handle3(typeof(EventHandlerOrderTestController3));
+
+        [EventHandler(ElementName = "Element4", Event = "Click")]
+        private Action PropertyHandler4 { get; set; } = () => handler.Handle4(typeof(EventHandlerOrderTestController3));
+
+        [EventHandler(ElementName = "Element1", Event = "Click")]
+        private void HandleWithMethod1() => handler.Handle1(typeof(EventHandlerOrderTestController3));
+
+        private void Element2_Click() => handler.Handle2(typeof(EventHandlerOrderTestController3));
+
+        private readonly IEventHandlerOrderHandler handler = handler;
+    }
+    
+    public interface IEventHandlerOrderHandler
+    {
+        void Handle1(Type type);
+        void Handle2(Type type);
+        void Handle3(Type type);
+        void Handle4(Type type);
     }
 
     public interface IDependency1;
