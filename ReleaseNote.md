@@ -1,5 +1,25 @@
 # Release note
 
+## v3.1.0
+
+### Add
+
+- Add the following methods in the EventHandlerExtension class so that event handlers are called from them defined in the base type:
+  - void RetrieveEventHandlers(object, TElement?, EventHandlerBase&lt;TElement, TItem&gt;)
+  - void RetrieveEventHandlersFromField(Type, object, TElement?, EventHandlerBase&lt;TElement, TItem&gt;)
+  - void RetrieveEventHandlersFromProperty(Type, object, TElement?, EventHandlerBase&lt;TElement, TItem&gt;)
+  - void RetrieveEventHandlersFromMethod(Type, object, TElement?, EventHandlerBase&lt;TElement, TItem&gt;)
+  - void RetrieveEventHandlersFromMethodUsingNamingConvention(Type, object, TElement?, EventHandlerBase&lt;TElement, TItem&gt;)
+
+### Change
+
+- Change the order of event handlers to be called from them defined in the base type.
+- Obsolete the following methods in the EventHandlerExtension class
+  - void RetrieveEventHandlersFromField(object, TElement?, EventHandlerBase&lt;TElement, TItem&gt;)
+  - void RetrieveEventHandlersFromProperty(object, TElement?, EventHandlerBase&lt;TElement, TItem&gt;)
+  - void RetrieveEventHandlersFromMethod(object, TElement?, EventHandlerBase&lt;TElement, TItem&gt;)
+  - void RetrieveEventHandlersFromMethodUsingNamingConvention(object, TElement?, EventHandlerBase&lt;TElement, TItem&gt;)
+
 ## v3.0.0
 
 ### Change

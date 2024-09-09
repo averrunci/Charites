@@ -6,11 +6,11 @@
     <Nullable>enable</Nullable>
     <RootNamespace>Charites.Windows.Mvc</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.0.0</Version>
+    <Version>3.1.0</Version>
     <Authors>averrunci</Authors>
-    <Copyright>Copyright (C) 2022-2023 Fievus</Copyright>
-    <AssemblyVersion>3.0.0</AssemblyVersion>
-    <FileVersion>3.0.0</FileVersion>
+    <Copyright>Copyright (C) 2022-2024 Fievus</Copyright>
+    <AssemblyVersion>3.1.0</AssemblyVersion>
+    <FileVersion>3.1.0</FileVersion>
     <NeutralLanguage>en-US</NeutralLanguage>
     <PackageProjectUrl>https://github.com/averrunci/Charites</PackageProjectUrl>
     <PackageTags>charites mvc</PackageTags>
