@@ -1,5 +1,11 @@
 # Release note
 
+## v3.2.0
+
+### Change
+
+- Change to specify multi keys to the key of a controller.
+
 ## v3.1.0
 
 ### Add
