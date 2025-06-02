@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022-2023 Fievus
+﻿// Copyright (C) 2022-2025 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -117,12 +117,11 @@ class EventHandlerActionSpec : FixtureSteppable
     public EventHandlerActionSpec()
     {
         ParameterResolver = new ParameterDependencyResolver(
-            new IEventHandlerParameterResolver[]
-            {
+            [
                 new EventHandlerParameterResolvers.EventHandlerParameterFromDIResolverTss(ParameterFromDIResolver),
                 new EventHandlerParameterResolvers.EventHandlerParameterFromElementResolverTss(),
                 new EventHandlerParameterResolvers.EventHandlerParameterFromDataContextResolverTss(DataContext)
-            }
+            ]
         );
     }
 

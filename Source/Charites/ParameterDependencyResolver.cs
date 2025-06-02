@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022 Fievus
+﻿// Copyright (C) 2022-2025 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -20,7 +20,7 @@ public class ParameterDependencyResolver : IParameterDependencyResolver
     /// </summary>
     public ParameterDependencyResolver()
     {
-        parameterResolver = Enumerable.Empty<IEventHandlerParameterResolver>();
+        parameterResolver = [];
     }
 
     /// <summary>
@@ -51,7 +51,7 @@ public class ParameterDependencyResolver : IParameterDependencyResolver
     /// </summary>
     /// <param name="dependencyInjectionResolver">The resolver to resolve parameters from the dependency injection.</param>
     [Obsolete("This constructor is obsolete. Use the .ctor(IEnumerable<IEventHandlerParameterResolver>, IEventHandlerParameterResolver) instead.")]
-    public ParameterDependencyResolver(IDictionary<Type, Func<object?>> dependencyInjectionResolver) : this(Enumerable.Empty<IEventHandlerParameterResolver>(), dependencyInjectionResolver)
+    public ParameterDependencyResolver(IDictionary<Type, Func<object?>> dependencyInjectionResolver) : this([], dependencyInjectionResolver)
     {
     }
 

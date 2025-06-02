@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022 Fievus
+﻿// Copyright (C) 2022-2025 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -93,7 +93,7 @@ public abstract class ElementInjector<TElement> : IElementInjector<TElement> whe
             .GetMethods(ElementBindingFlags)
             .Select(method => new { Method = method, Attribute = method.GetCustomAttribute<ElementAttribute>(true) })
             .Where(t => t.Attribute is not null)
-            .ForEach(t => InjectElement(rootElement, t.Attribute!.Name ?? ResolveElementMethodName(t.Method, t.Attribute), controller, foundElementOnly, element => t.Method.Invoke(controller, new[] { element })));
+            .ForEach(t => InjectElement(rootElement, t.Attribute!.Name ?? ResolveElementMethodName(t.Method, t.Attribute), controller, foundElementOnly, element => t.Method.Invoke(controller, [element])));
 
     /// <summary>
     /// Resolves an element name from a method to get it.

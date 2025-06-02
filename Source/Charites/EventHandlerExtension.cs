@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022-2024 Fievus
+﻿// Copyright (C) 2022-2025 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -23,7 +23,7 @@ public abstract class EventHandlerExtension<TElement, TItem> : IControllerExtens
     /// Gets the resolver to resolve parameters of an event handler.
     /// </summary>
     protected IEnumerable<Type> ParameterResolverTypes => parameterResolverTypes;
-    private readonly List<Type> parameterResolverTypes = new();
+    private readonly List<Type> parameterResolverTypes = [];
 
     /// <summary>
     /// Adds the specified type of a resolver to resolve of parameters of an event handler.

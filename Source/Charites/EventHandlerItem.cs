@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022 Fievus
+﻿// Copyright (C) 2022-2025 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -40,7 +40,7 @@ public abstract class EventHandlerItem<TElement> where TElement : class
         this.eventName = eventName;
         this.handler = handler;
         this.handledEventsToo = handledEventsToo;
-        parameterResolver = Enumerable.Empty<IEventHandlerParameterResolver>();
+        parameterResolver = [];
     }
 
     /// <summary>

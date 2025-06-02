@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022 Fievus
+﻿// Copyright (C) 2022-2025 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -15,16 +15,17 @@ class ControllerCollectionSpec : FixtureSteppable
     IDataContextFinder<TestElement> DataContextFinder { get; } = Substitute.For<IDataContextFinder<TestElement>>();
     IDataContextInjector DataContextInjector { get; } = Substitute.For<IDataContextInjector>();
     IElementInjector<TestElement> ElementInjector { get; } = Substitute.For<IElementInjector<TestElement>>();
-    IControllerExtension<TestElement>[] Extensions { get; } = {
+    IControllerExtension<TestElement>[] Extensions { get; } =
+    [
         Substitute.For<IControllerExtension<TestElement>>(),
         Substitute.For<IControllerExtension<TestElement>>(),
         Substitute.For<IControllerExtension<TestElement>>()
-    };
+    ];
 
     TestElement Element1 { get; } = new("Element1");
     object DataContext { get; } = new();
 
-    object[] ActualControllers { get; } = { new(), new(), new() };
+    object[] ActualControllers { get; } = [new(), new(), new()];
     TestControllers.DisposableController DisposableController { get; } = new();
 
     public ControllerCollectionSpec()

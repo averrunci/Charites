@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022 Fievus
+﻿// Copyright (C) 2022-2025 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -47,7 +47,7 @@ public class DataContextInjector : IDataContextInjector
         => controller.GetType()
             .GetMethods(DataContextBindingFlags)
             .Where(method => method.GetCustomAttribute<DataContextAttribute>(true) is not null)
-            .ForEach(method => InjectDataContext(controller, () => method.Invoke(controller, new[] { dataContext })));
+            .ForEach(method => InjectDataContext(controller, () => method.Invoke(controller, [dataContext])));
 
     /// <summary>
     /// Injects the specified data context to methods of the specified controller using a naming convention.
@@ -59,7 +59,7 @@ public class DataContextInjector : IDataContextInjector
             .GetMethods(DataContextBindingFlags)
             .Where(method => method.Name == "SetDataContext")
             .Where(method => method.GetCustomAttribute<DataContextAttribute>(true) is null)
-            .ForEach(method => InjectDataContext(controller, () => method.Invoke(controller, new[] { dataContext })));
+            .ForEach(method => InjectDataContext(controller, () => method.Invoke(controller, [dataContext])));
 
     /// <summary>
     /// Injects the specified data context using the specified action.

@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022-2023 Fievus
+﻿// Copyright (C) 2022-2025 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -190,7 +190,7 @@ class EventHandlerBaseSpec : FixtureSteppable
         Item16 = new EventHandlerItemTss(Element5.Name, Element5, Event5, Event5AsyncHandler, true);
         Item17 = new EventHandlerItemTss(Element6.Name, Element6, Event6, Event6AsyncHandler, true);
         Item18 = new EventHandlerItemTss(Element6.Name, Element6, Event6, Event6AsyncHandler, true);
-        Items = new[] { Item1, Item2, Item3, Item4, Item5, Item6, Item7, Item8, Item11, Item12, Item13, Item14, Item15, Item16, Item17, Item18 };
+        Items = [Item1, Item2, Item3, Item4, Item5, Item6, Item7, Item8, Item11, Item12, Item13, Item14, Item15, Item16, Item17, Item18];
 
         EventHandlerBase.Add(Item1);
         EventHandlerBase.Add(Item2);
