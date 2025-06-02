@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022 Fievus
+﻿// Copyright (C) 2022-2025 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -162,5 +162,23 @@ class ControllerTypeFinderSpec : FixtureSteppable
                 ExpectedControllerTypes = new[] { typeof(TestControllers.InterfaceImplementedTestDataContextFullNameController) }
             };
         }
+    }
+    
+    [Example("When the multi key are specified")]
+    void Ex06()
+    {
+        ElementKeyFinder.FindKey(Element).Returns("TestElement2  , ,  TestElement3");
+        DataContextFinder.Find(Element).Returns(new TestControllers.TestDataContext());
+
+        When("the element that has the key is specified", () => ControllerTypes = ControllerTypeFinder.Find(Element));
+        Then("the found controller types should be ones attributed by the same key, the same type, or no specified", () =>
+            ControllerTypes.SequenceEqual(new []
+            {
+                typeof(TestControllers.TestElement2Controller),
+                typeof(TestControllers.TestElement3Controller),
+                typeof(TestControllers.TestElementController),
+                typeof(TestControllers.ViewController)
+            })
+        );
     }
 }

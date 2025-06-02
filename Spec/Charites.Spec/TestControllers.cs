@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022-2024 Fievus
+﻿// Copyright (C) 2022-2025 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -260,6 +260,12 @@ internal static class TestControllers
 
     [View(Key = "TestElement1")]
     public class TestElement1Controller;
+    
+    [View(Key = "TestElement2")]
+    public class TestElement2Controller;
+    
+    [View(Key = "TestElement3")]
+    public class TestElement3Controller;
 
     [View(ViewType = typeof(TestElement))]
     public class TestElementController;

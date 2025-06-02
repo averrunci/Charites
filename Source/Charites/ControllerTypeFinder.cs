@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2022 Fievus
+﻿// Copyright (C) 2022-2025 Fievus
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
@@ -34,8 +34,8 @@ public abstract class ControllerTypeFinder<TElement> : IControllerTypeFinder<TEl
         {
             if (key is null) return true;
 
-            var elementKey = elementKeyFinder.FindKey(element);
-            return elementKey is null ? IsKeyDataContextType(key, dataContextFinder.Find(element)?.GetType()) : Equals(key, elementKey);
+            var elementKeys = elementKeyFinder.FindKey(element)?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            return elementKeys?.Contains(key) ?? IsKeyDataContextType(key, dataContextFinder.Find(element)?.GetType());
         };
     }
 
